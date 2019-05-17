@@ -1,0 +1,44 @@
+server:
+  # Tomcat
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 300
+    min-spare-threads: 30
+  #  FIXME 配置端口
+  port: 8080
+  connection-timeout: 5000
+
+spring:
+  # FIXME 环境 dev|pro
+  profiles:
+    active: dev
+
+  # jackson时间格式化
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+
+  # AOP 配置
+  aop:
+    auto: true
+    proxy-target-class: false
+
+  # JPA 配置
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        use_sql_comments: true
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 10MB
+      enabled: true
+
+
+
