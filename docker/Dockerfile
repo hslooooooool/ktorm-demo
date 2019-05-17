@@ -9,7 +9,7 @@ ARG JAR_FILE
 ADD ${JAR_FILE} app.jar
 
 # 开放8081端口
-EXPOSE 9092
+EXPOSE 8081
 
 # 配置容器启动后执行的命令
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]

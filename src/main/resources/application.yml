@@ -5,7 +5,7 @@ server:
     max-threads: 300
     min-spare-threads: 30
   #  FIXME 配置端口
-  port: 8080
+  port: 8081
   connection-timeout: 5000
 
 spring:
@@ -22,17 +22,6 @@ spring:
   aop:
     auto: true
     proxy-target-class: false
-
-  # JPA 配置
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: true
-        use_sql_comments: true
-        format_sql: true
 
   servlet:
     multipart:

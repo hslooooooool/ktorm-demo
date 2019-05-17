@@ -1,6 +1,7 @@
 package vip.qsos.ktorm.localupload.entity
 
 import java.util.*
+import javax.annotation.sql.DataSourceDefinition
 import javax.persistence.*
 
 /**

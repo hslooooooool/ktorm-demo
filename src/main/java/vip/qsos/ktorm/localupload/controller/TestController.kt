@@ -25,11 +25,9 @@ constructor() : BaseController() {
             Employees.add(e)
             println("新增数据 $i")
         }
-        val e = Employees.findOne { it.name eq "Name1" }
-        println("查询name=Name1的数据 $e")
         val testList = Employees.findAll()
         println("查询到数据 ${testList.size} 条")
-        return Result.ok("数据库查询成功").put("results", testList)
+        return Result.ok("数据库查询成功").add("results", testList)
     }
 
 }

@@ -13,8 +13,8 @@ class Result : HashMap<String, Any>() {
         put("msg", "success")
     }
 
-    override fun put(key: String, value: Any): Result {
-        set(key, value)
+    fun add(key: String, value: Any): Result {
+        this[key] = value
         return this
     }
 

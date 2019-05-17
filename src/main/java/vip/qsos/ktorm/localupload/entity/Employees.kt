@@ -9,15 +9,13 @@ import java.time.LocalDate
  * @date : 2019-05-17
  * @description : TODO 类说明，描述此类的类型和用途
  */
-object Employees : Table<Employee>("T_EMPLOYEE") {
-    val id by int("id").primaryKey()
-    val name by varchar("name")
-    val job by varchar("job")
-    val managerId by int("manager_id")
-    val hireDate by date("hire_date")
-    val salary by long("salary")
-    val departmentId by int("department_id"
-    )
+object Employees : Table<Employee>("t_employee") {
+    val id by int("id").primaryKey().bindTo { it.id }
+    val name by varchar("name").bindTo { it.name }
+    val job by varchar("job").bindTo { it.job }
+    val managerId by int("manager_id").bindTo { it.manager?.id }
+    val hireDate by date("hire_date").bindTo { it.hireDate }
+    val salary by long("salary").bindTo { it.salary }
 }
 
 interface Employee : Entity<Employee> {
@@ -28,12 +26,12 @@ interface Employee : Entity<Employee> {
 
     var name: String
 
-    var job: String
+    var job: String?
 
     var manager: Employee?
 
-    var hireDate: LocalDate
+    var hireDate: LocalDate?
 
-    var salary: Long
+    var salary: Long?
 
 }
