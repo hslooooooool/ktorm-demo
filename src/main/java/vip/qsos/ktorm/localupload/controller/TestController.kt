@@ -1,9 +1,9 @@
 package vip.qsos.ktorm.localupload.controller
 
-import me.liuwj.ktorm.dsl.eq
+import com.sun.tracing.dtrace.ModuleName
+import io.swagger.annotations.ApiOperation
 import me.liuwj.ktorm.entity.add
 import me.liuwj.ktorm.entity.findAll
-import me.liuwj.ktorm.entity.findOne
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -11,12 +11,14 @@ import vip.qsos.ktorm.localupload.entity.Employee
 import vip.qsos.ktorm.localupload.entity.Employees
 import vip.qsos.ktorm.util.Result
 
+@ModuleName("TEST")
 @RestController
 class TestController
 @Autowired
 constructor() : BaseController() {
 
     @GetMapping("/test")
+    @ApiOperation(value = "测试接口", notes = "仅用于框架测试连通性")
     fun test(): Result {
         for (i in 0..4) {
             val e = Employee()

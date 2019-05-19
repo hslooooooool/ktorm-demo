@@ -1,5 +1,7 @@
 package vip.qsos.ktorm.util
 
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 import java.util.*
 
 /**
@@ -7,10 +9,16 @@ import java.util.*
  * @date : 2019-05-17
  * @description : 统一返回结果
  */
+@ApiModel(value = "统一返回结果")
 class Result : HashMap<String, Any>() {
+    @ApiModelProperty(value = "返回码", example = "200", notes = "成功：200")
+    var code: Int = 200
+    @ApiModelProperty(value = "返回信息", example = "请求成功", notes = "请求结果消息")
+    var msg: String = "请求成功"
+
     init {
-        put("code", 200)
-        put("msg", "success")
+        put("code", code)
+        put("msg", msg)
     }
 
     fun add(key: String, value: Any): Result {
