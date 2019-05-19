@@ -38,8 +38,14 @@ spring:
     open-in-view: true
     # 配置是否将执行的 SQL 输出到日志
     show-sql: true
-    properties:
-      hibernate:
-        hbm2ddl:
-          # 配置开启自动更新表结构
-          auto: update
+    hibernate:
+      ddl-auto: create-drop
+
+app:
+  # APP模块，是通过jwt认证的，如果要使用APP模块，则需要修改【加密秘钥】
+  jwt:
+    # 加密秘钥
+    secret: f4e2e52034348f86b67cde581c0f9eb5[www.qsos.vip]
+    # token 有效时长，7 天，单位秒
+    expire: 604800
+    header: token

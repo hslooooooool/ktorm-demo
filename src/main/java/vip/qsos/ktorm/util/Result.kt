@@ -2,7 +2,6 @@ package vip.qsos.ktorm.util
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import java.util.*
 
 /**
  * @author : 华清松
@@ -10,37 +9,23 @@ import java.util.*
  * @description : 统一返回结果
  */
 @ApiModel(value = "统一返回结果")
-class Result : HashMap<String, Any>() {
+class Result<T> {
     @ApiModelProperty(value = "返回码", example = "200", notes = "成功：200")
     var code: Int = 200
     @ApiModelProperty(value = "返回信息", example = "请求成功", notes = "请求结果消息")
     var msg: String = "请求成功"
+    @ApiModelProperty(value = "请求结果", notes = "请求结果数据")
+    var results: List<T> = arrayListOf()
 
-    init {
-        put("code", code)
-        put("msg", msg)
-    }
-
-    fun add(key: String, value: Any): Result {
-        this[key] = value
+    fun result(data: List<T>): Result<T> {
+        this.results = data
         return this
     }
 
-    companion object {
-        private const val serialVersionUID = 1L
-
-        @JvmOverloads
-        fun error(msg: String = "未知异常，请联系管理员"): Result {
-            val result = Result()
-            result["code"] = 500
-            result["msg"] = msg
-            return result
-        }
-
-        fun ok(msg: String): Result {
-            val result = Result()
-            result["msg"] = msg
-            return result
-        }
+    fun error(code: Int, msg: String): Result<T> {
+        this.code = code
+        this.msg = msg
+        this.results = arrayListOf()
+        return this
     }
 }

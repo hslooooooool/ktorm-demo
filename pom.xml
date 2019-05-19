@@ -172,7 +172,12 @@
             <artifactId>swagger-bootstrap-ui</artifactId>
             <version>${swaggerui.version}</version>
         </dependency>
-
+        <!--jtw-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.7.0</version>
+        </dependency>
     </dependencies>
 
     <!--阿里云maven镜像-->

@@ -53,7 +53,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
                 .description("Ktorm ORM 演示项目接口文档")
                 .termsOfServiceUrl("https://github.com/vincentlauvlwj/Ktorm")
                 .version("1.0.0")
-                .contact(new Contact("华清松", "http://blog.qsos.vip", "821034742@qq.com"))
+                .contact(new Contact("华清松", "https://github.com/hslooooooool/ktorm-demo", "821034742@qq.com"))
                 .license("Apache 2.0")
                 .build();
     }

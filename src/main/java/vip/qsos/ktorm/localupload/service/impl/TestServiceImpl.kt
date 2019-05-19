@@ -1,10 +1,9 @@
 package vip.qsos.ktorm.localupload.service.impl
 
-import me.liuwj.ktorm.entity.add
 import me.liuwj.ktorm.entity.findAll
 import org.springframework.stereotype.Service
-import vip.qsos.ktorm.localupload.entity.Employee
 import vip.qsos.ktorm.localupload.entity.Employees
+import vip.qsos.ktorm.localupload.entity.IEmployee
 import vip.qsos.ktorm.localupload.service.TestService
 
 /**
@@ -15,17 +14,11 @@ import vip.qsos.ktorm.localupload.service.TestService
 @Service
 open class TestServiceImpl : TestService {
 
-    override fun findAll(): List<Employee> {
+    override fun findAll(): List<IEmployee> {
         return Employees.findAll()
     }
 
     override fun inset() {
-        for (i in 0..4) {
-            val e = Employee()
-            e.name = "Name$i"
-            e.job = "JOB$i"
-            val id = Employees.add(e)
-            print(id)
-        }
+
     }
 }
