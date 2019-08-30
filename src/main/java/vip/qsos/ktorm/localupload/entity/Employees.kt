@@ -4,10 +4,8 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.entity.Entity
 import me.liuwj.ktorm.schema.Table
-import me.liuwj.ktorm.schema.date
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
-import java.time.LocalDate
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -24,8 +22,8 @@ object Employees : Table<IEmployee>(TAB_NAME) {
     val id by int("id").primaryKey().bindTo { it.id }
     val name by varchar("name").bindTo { it.name }
     val job by varchar("job").bindTo { it.job }
+    val head by varchar("head").bindTo { it.head }
     val managerId by int("manager_id").bindTo { it.managerId }
-    val hireDate by date("hire_date").bindTo { it.hireDate }
 }
 
 interface IEmployee : Entity<IEmployee> {
@@ -36,7 +34,7 @@ interface IEmployee : Entity<IEmployee> {
     var name: String
     var managerId: Int?
     var job: String?
-    var hireDate: LocalDate?
+    var head: String?
 }
 
 @javax.persistence.Entity
@@ -56,13 +54,12 @@ data class TableEmployee(
         var managerId: Int?,
         @Column(name = "job")
         var job: String?,
-        @Column(name = "hire_date")
-        @ApiModelProperty(name = "hireDate", value = "雇佣时间", dataType = "LocalDate")
-        var hireDate: LocalDate?
+        @Column(name = "head")
+        var head: String?
 ) {
     companion object {
         fun trans(e: IEmployee): TableEmployee {
-            return TableEmployee(e.id, e.name, e.managerId, e.job, e.hireDate)
+            return TableEmployee(e.id, e.name, e.managerId, e.job, e.head)
         }
     }
 }

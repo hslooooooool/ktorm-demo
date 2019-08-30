@@ -15,17 +15,17 @@ class Result<T> {
     @ApiModelProperty(value = "返回信息", example = "请求成功", notes = "请求结果消息")
     var msg: String = "请求成功"
     @ApiModelProperty(value = "请求结果", notes = "请求结果数据")
-    var results: List<T> = arrayListOf()
+    var data: T? = null
 
-    fun result(data: List<T>): Result<T> {
-        this.results = data
+    fun result(data: T): Result<T> {
+        this.data = data
         return this
     }
 
     fun error(code: Int, msg: String): Result<T> {
         this.code = code
         this.msg = msg
-        this.results = arrayListOf()
+        this.data = null
         return this
     }
 }
