@@ -25,7 +25,7 @@ open class KtormConfiguration {
     @Bean
     open fun database(): Database {
         val logger = LoggerFactory.getLogger(Database::class.java)
-        return Database.connectWithSpringSupport(dataSource, MySqlDialect, Slf4jLoggerAdapter(logger))
+        return Database.connectWithSpringSupport(dataSource, MySqlDialect(), Slf4jLoggerAdapter(logger))
     }
 
     @Bean

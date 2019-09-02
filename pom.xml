@@ -41,9 +41,9 @@
         <docker.images.name>
             ${docker.repository}/${docker.registry.name}/${project.artifactId}:${project.version}
         </docker.images.name>
-        <kotlin.version>1.3.31</kotlin.version>
+        <kotlin.version>1.3.41</kotlin.version>
 
-        <ktorm.version>2.2</ktorm.version>
+        <ktorm.version>2.5</ktorm.version>
     </properties>
 
     <dependencies>
