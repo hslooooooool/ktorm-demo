@@ -5,6 +5,7 @@ import me.liuwj.ktorm.entity.add
 import me.liuwj.ktorm.entity.findAll
 import me.liuwj.ktorm.entity.findById
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import vip.qsos.ktorm.localupload.entity.Employees
 import vip.qsos.ktorm.localupload.entity.IEmployee
@@ -14,9 +15,26 @@ import vip.qsos.ktorm.util.Result
 @RestController
 class TestController : BaseController() {
 
+    @PostMapping("/add")
+    @ApiOperation(value = "测试接口", notes = "仅用于框架测试连通性")
+    fun add(): Result<TableEmployee> {
+        val e = IEmployee()
+        e.name = "Name"
+        e.job = "JOB"
+        e.head = "http://blog.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
+        e.managerId = 1
+        var id: Int? = null
+        Employees.add(e).let {
+            id = it
+        }
+        println("新增1条数据")
+        val result = TableEmployee(id, e.name, e.managerId, e.job, e.head)
+        return Result<TableEmployee>().result(result)
+    }
+
     @GetMapping("/list")
     @ApiOperation(value = "测试接口", notes = "仅用于框架测试连通性")
-    fun test(): Result<List<TableEmployee>> {
+    fun findAll(): Result<List<TableEmployee>> {
         val e = IEmployee()
         e.name = "Name"
         e.job = "JOB"
@@ -33,7 +51,7 @@ class TestController : BaseController() {
 
     @GetMapping("/one")
     @ApiOperation(value = "测试接口", notes = "仅用于框架测试连通性")
-    fun getOne(): Result<TableEmployee> {
+    fun findOne(): Result<TableEmployee> {
         Employees.findById(1).let {
             return if (it == null) {
                 Result<TableEmployee>().error(500, "无法找到")
