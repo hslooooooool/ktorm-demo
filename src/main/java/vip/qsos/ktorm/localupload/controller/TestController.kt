@@ -1,16 +1,11 @@
 package vip.qsos.ktorm.localupload.controller
 
 import io.swagger.annotations.ApiOperation
-import me.liuwj.ktorm.dsl.delete
-import me.liuwj.ktorm.dsl.deleteAll
-import me.liuwj.ktorm.dsl.eq
-import me.liuwj.ktorm.dsl.update
-import me.liuwj.ktorm.entity.add
+import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.findAll
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.localupload.entity.Employees
-import vip.qsos.ktorm.localupload.entity.IEmployee
 import vip.qsos.ktorm.localupload.entity.TableEmployee
 import vip.qsos.ktorm.util.Result
 
@@ -20,14 +15,16 @@ class TestController : BaseController() {
     @PostMapping("/add")
     @ApiOperation(value = "测试接口")
     fun add(): Result<TableEmployee> {
-        val e = IEmployee()
-        e.name = "Name"
-        e.job = "JOB2"
-        e.head = "http://img.sccnn.com/bimg/338/42729.jpg"
-        e.managerId = 1
-        val result = TableEmployee(Employees.add(e), e.name, e.managerId, e.job, e.head)
+        val e = TableEmployee(name = "Name", job = "JOB2", head = "http://img.sccnn.com/bimg/338/42729.jpg", managerId = 1)
+        val result = Employees.insert {
+            it.name to e.name
+            it.head to e.head
+            it.job to e.job
+            it.managerId to e.managerId
+        }
+        e.id = result
         println("新增1条数据")
-        return Result<TableEmployee>().result(result)
+        return Result<TableEmployee>().result(e)
     }
 
     @DeleteMapping("/delete")
@@ -48,7 +45,7 @@ class TestController : BaseController() {
 
     @PutMapping("/update")
     @ApiOperation(value = "测试接口")
-    fun update(@RequestBody em: IEmployee): Result<IEmployee> {
+    fun update(@RequestBody em: TableEmployee): Result<TableEmployee> {
         Employees.update {
             it.name to em.name
             it.job to em.job
@@ -59,13 +56,13 @@ class TestController : BaseController() {
             }
         }
         println("更新数据")
-        return Result<IEmployee>().result(em)
+        return Result<TableEmployee>().result(em)
     }
 
     @GetMapping("/list")
     @ApiOperation(value = "测试接口")
     fun findAll(): Result<List<TableEmployee>> {
-        val testList = Employees.findAll().map { TableEmployee.trans(it) }
+        val testList = Employees.findAll()
         println("查询到数据 ${testList.size} 条")
         return Result<List<TableEmployee>>().result(testList)
     }
@@ -79,8 +76,7 @@ class TestController : BaseController() {
         return if (one == null) {
             Result<TableEmployee>().error(500, "无法找到")
         } else {
-            TableEmployee.trans(one)
-            Result<TableEmployee>().result(TableEmployee.trans(one))
+            Result<TableEmployee>().result(one)
         }
 
     }

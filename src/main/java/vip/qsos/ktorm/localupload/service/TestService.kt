@@ -1,6 +1,6 @@
 package vip.qsos.ktorm.localupload.service
 
-import vip.qsos.ktorm.localupload.entity.IEmployee
+import vip.qsos.ktorm.localupload.entity.TableEmployee
 
 /**
  * @author : 华清松
@@ -8,7 +8,7 @@ import vip.qsos.ktorm.localupload.entity.IEmployee
  * @description : TODO 类说明，描述此类的类型和用途
  */
 interface TestService {
-    fun findAll(): List<IEmployee>
+    fun findAll(): List<TableEmployee>
 
     fun inset()
 }
