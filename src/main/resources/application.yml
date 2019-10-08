@@ -2,8 +2,8 @@ server:
   # Tomcat
   tomcat:
     uri-encoding: UTF-8
-    max-threads: 300
-    min-spare-threads: 30
+    max-threads: 30
+    min-spare-threads: 10
   #  FIXME 配置端口
   port: 8084
   connection-timeout: 5000
