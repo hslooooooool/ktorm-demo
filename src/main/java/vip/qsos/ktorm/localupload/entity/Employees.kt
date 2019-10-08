@@ -2,8 +2,8 @@ package vip.qsos.ktorm.localupload.entity
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import me.liuwj.ktorm.entity.Entity
-import me.liuwj.ktorm.schema.Table
+import me.liuwj.ktorm.dsl.QueryRowSet
+import me.liuwj.ktorm.schema.BaseTable
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
 import javax.persistence.Column
@@ -18,23 +18,22 @@ private const val TAB_NAME = "t_employee"
  * @date : 2019-05-17
  * @description : TODO 类说明，描述此类的类型和用途
  */
-object Employees : Table<IEmployee>(TAB_NAME) {
-    val id by int("id").primaryKey().bindTo { it.id }
-    val name by varchar("name").bindTo { it.name }
-    val job by varchar("job").bindTo { it.job }
-    val head by varchar("head").bindTo { it.head }
-    val managerId by int("manager_id").bindTo { it.managerId }
-}
+object Employees : BaseTable<TableEmployee>(TAB_NAME) {
+    val id by int("id").primaryKey()
+    val name by varchar("name")
+    val job by varchar("job")
+    val head by varchar("head")
+    val managerId by int("manager_id")
 
-interface IEmployee : Entity<IEmployee> {
-
-    companion object : Entity.Factory<IEmployee>()
-
-    val id: Int?
-    var name: String
-    var managerId: Int?
-    var job: String?
-    var head: String?
+    override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableEmployee {
+        return TableEmployee(
+                id = row[id],
+                name = row[name] ?: "",
+                job = row[job] ?: "",
+                head = row[head] ?: "",
+                managerId = row[managerId]
+        )
+    }
 }
 
 @javax.persistence.Entity
@@ -45,7 +44,7 @@ data class TableEmployee(
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @ApiModelProperty(name = "id", value = "雇员ID", dataType = "Int")
-        var id: Int?,
+        var id: Int? = null,
         @Column(name = "name")
         @ApiModelProperty(name = "name", value = "雇员名称", dataType = "String")
         var name: String,
@@ -56,10 +55,4 @@ data class TableEmployee(
         var job: String?,
         @Column(name = "head")
         var head: String?
-) {
-    companion object {
-        fun trans(e: IEmployee): TableEmployee {
-            return TableEmployee(e.id, e.name, e.managerId, e.job, e.head)
-        }
-    }
-}
+)

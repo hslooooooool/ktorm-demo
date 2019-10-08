@@ -5,7 +5,7 @@ server:
     max-threads: 30
     min-spare-threads: 10
   #  FIXME 配置端口
-  port: 8084
+  port: 8081
   connection-timeout: 5000
 
 spring:
