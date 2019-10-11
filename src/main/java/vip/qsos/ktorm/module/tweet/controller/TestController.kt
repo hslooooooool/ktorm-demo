@@ -9,12 +9,12 @@ import vip.qsos.ktorm.module.tweet.entity.DBEmployees
 import vip.qsos.ktorm.module.tweet.entity.TableEmployee
 import vip.qsos.ktorm.util.MResult
 
-@RestController
-class TestController {
+@RestController(value = "/tweet")
+open class TestController {
 
     @PostMapping("/add")
     @ApiOperation(value = "测试接口")
-    fun add(): MResult<TableEmployee> {
+    open fun add(): MResult<TableEmployee> {
         val e = TableEmployee(name = "Name", job = "JOB2", head = "http://img.sccnn.com/bimg/338/42729.jpg", managerId = 1)
         val result = DBEmployees.insert {
             it.name to e.name
@@ -29,7 +29,7 @@ class TestController {
 
     @DeleteMapping("/delete")
     @ApiOperation(value = "测试接口")
-    fun delete(): MResult<String> {
+    open fun delete(): MResult<String> {
         DBEmployees.delete { it.name.eq("JOB2") }
         println("删除1条数据")
         return MResult<String>().result("删除成功")
@@ -37,7 +37,7 @@ class TestController {
 
     @DeleteMapping("/clear")
     @ApiOperation(value = "测试接口")
-    fun clear(): MResult<String> {
+    open fun clear(): MResult<String> {
         DBEmployees.deleteAll()
         println("清除数据")
         return MResult<String>().result("清除数据")
@@ -45,7 +45,7 @@ class TestController {
 
     @PutMapping("/update")
     @ApiOperation(value = "测试接口")
-    fun update(@RequestBody em: TableEmployee): MResult<TableEmployee> {
+    open fun update(@RequestBody em: TableEmployee): MResult<TableEmployee> {
         DBEmployees.update {
             it.name to em.name
             it.job to em.job
@@ -61,7 +61,7 @@ class TestController {
 
     @GetMapping("/list")
     @ApiOperation(value = "测试接口")
-    fun findAll(): MResult<List<TableEmployee>> {
+    open fun findAll(): MResult<List<TableEmployee>> {
         val testList = DBEmployees.findAll()
         println("查询到数据 ${testList.size} 条")
         return MResult<List<TableEmployee>>().result(testList)
@@ -69,7 +69,7 @@ class TestController {
 
     @GetMapping("/one")
     @ApiOperation(value = "测试接口")
-    fun findOne(): MResult<TableEmployee> {
+    open fun findOne(): MResult<TableEmployee> {
         val one = DBEmployees.findOne {
             it.name eq "Name"
         }

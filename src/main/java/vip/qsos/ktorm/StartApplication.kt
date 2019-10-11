@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
  * @description : 启动类
  */
 @SpringBootApplication
-open class FileStreamApplication
+open class StartApplication
 
 fun main(args: Array<String>) {
-    SpringApplication.run(FileStreamApplication::class.java, *args)
+    SpringApplication.run(StartApplication::class.java, *args)
 }

@@ -12,18 +12,25 @@ import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.module.tweet.entity.DBEmployees
 import vip.qsos.ktorm.util.MResult
 
-@RestController(value = "/chat")
-class ChatMessageController : IChatModelConfig {
+@RestController
+@RequestMapping("/chat")
+open class ChatMessageController : IChatModelConfig {
+
+    @GetMapping("/test")
+    @ApiOperation(value = "测试接口")
+    open fun test(): MResult<String> {
+        return MResult<String>().result("OK")
+    }
 
     @GetMapping("/session")
     @ApiOperation(value = "测试接口")
-    override fun getSessionById(sessionId: Long): MResult<ChatSession> {
+    open override fun getSessionById(sessionId: Long): MResult<ChatSession> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/message")
-    @ApiOperation(value = "测试接口")
-    override fun getMessageById(messageId: Long): MResult<ChatMessage> {
+    @ApiOperation(value = "获取消息数据")
+    open override fun getMessageById(messageId: Long): MResult<ChatMessage> {
         val one = DBChatMessage.findOne {
             it.messageId eq messageId
         }?.let {
@@ -38,37 +45,37 @@ class ChatMessageController : IChatModelConfig {
 
     @GetMapping("/user")
     @ApiOperation(value = "测试接口")
-    override fun getUserById(userId: Long): MResult<ChatUser> {
+    open override fun getUserById(userId: Long): MResult<ChatUser> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/group")
     @ApiOperation(value = "测试接口")
-    override fun getGroupById(groupId: Long): MResult<ChatGroup> {
+    open override fun getGroupById(groupId: Long): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/content")
     @ApiOperation(value = "测试接口")
-    override fun getContentById(contentId: Long): MResult<ChatContent> {
+    open override fun getContentById(contentId: Long): MResult<ChatContent> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/group/getGroupByBySessionId")
     @ApiOperation(value = "测试接口")
-    override fun getGroupByBySessionId(sessionId: Long): MResult<ChatGroup> {
+    open override fun getGroupByBySessionId(sessionId: Long): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/user/getUserListBySessionId")
     @ApiOperation(value = "测试接口")
-    override fun getUserListBySessionId(sessionId: Long): MResult<List<ChatUser>> {
+    open override fun getUserListBySessionId(sessionId: Long): MResult<List<ChatUser>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/message/getMessageListBySessionId")
-    @ApiOperation(value = "测试接口")
-    override fun getMessageListBySessionId(sessionId: Long): MResult<List<ChatMessage>> {
+    @ApiOperation(value = "获取会话下的消息列表")
+    open override fun getMessageListBySessionId(sessionId: Long): MResult<List<ChatMessage>> {
         val list = DBChatMessage.findList {
             it.sessionId eq sessionId
         }.map {
@@ -79,19 +86,19 @@ class ChatMessageController : IChatModelConfig {
 
     @GetMapping("/message/getMessageListByUserId")
     @ApiOperation(value = "测试接口")
-    override fun getMessageListByUserId(userId: Long): MResult<List<ChatMessage>> {
+    open override fun getMessageListByUserId(userId: Long): MResult<List<ChatMessage>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/session/getSessionListByUserId")
     @ApiOperation(value = "测试接口")
-    override fun getSessionListByUserId(userId: Long): MResult<List<ChatSession>> {
+    open override fun getSessionListByUserId(userId: Long): MResult<List<ChatSession>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PostMapping("/message/sendMessage")
     @ApiOperation(value = "测试接口")
-    override fun sendMessage(message: ChatMessage): MResult<ChatMessage> {
+    open override fun sendMessage(message: ChatMessage): MResult<ChatMessage> {
         message.content = ChatContent()
         val map = HashMap<String, Any?>()
         map["contentType"] = 0
@@ -132,43 +139,43 @@ class ChatMessageController : IChatModelConfig {
 
     @PutMapping("/session/createSession")
     @ApiOperation(value = "测试接口")
-    override fun createSession(userIdList: List<Long>, message: ChatMessage?): MResult<ChatSession> {
+    open override fun createSession(userIdList: List<Long>, message: ChatMessage?): MResult<ChatSession> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PostMapping("/session/addUserListToSession")
     @ApiOperation(value = "测试接口")
-    override fun addUserListToSession(userIdList: List<Long>, sessionId: Long): MResult<ChatSession> {
+    open override fun addUserListToSession(userIdList: List<Long>, sessionId: Long): MResult<ChatSession> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PutMapping("/group/updateGroupNotice")
     @ApiOperation(value = "测试接口")
-    override fun updateGroupNotice(notice: String): MResult<ChatGroup> {
+    open override fun updateGroupNotice(notice: String): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PutMapping("/group/updateGroupName")
     @ApiOperation(value = "测试接口")
-    override fun updateGroupName(name: String): MResult<ChatGroup> {
+    open override fun updateGroupName(name: String): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PostMapping("/session")
     @ApiOperation(value = "测试接口")
-    override fun deleteSession(sessionId: Long): MResult<Boolean> {
+    open override fun deleteSession(sessionId: Long): MResult<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @DeleteMapping("/user")
     @ApiOperation(value = "测试接口")
-    override fun deleteUser(sessionId: Long, userId: Long): MResult<Boolean> {
+    open override fun deleteUser(sessionId: Long, userId: Long): MResult<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @DeleteMapping("/message")
     @ApiOperation(value = "测试接口")
-    override fun deleteMessage(messageId: Long): MResult<Boolean> {
+    open override fun deleteMessage(messageId: Long): MResult<Boolean> {
         DBEmployees.delete { it.managerId.eq(messageId.toInt()) }
         return MResult<Boolean>().result(true)
     }
