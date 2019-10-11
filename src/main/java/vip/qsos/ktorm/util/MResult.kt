@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty
  * @description : 统一返回结果
  */
 @ApiModel(value = "统一返回结果")
-class Result<T> {
+class MResult<T> {
     @ApiModelProperty(value = "返回码", example = "200", notes = "成功：200")
     var code: Int = 200
     @ApiModelProperty(value = "返回信息", example = "请求成功", notes = "请求结果消息")
@@ -17,12 +17,12 @@ class Result<T> {
     @ApiModelProperty(value = "请求结果", notes = "请求结果数据")
     var data: T? = null
 
-    fun result(data: T): Result<T> {
+    fun result(data: T): MResult<T> {
         this.data = data
         return this
     }
 
-    fun error(code: Int, msg: String): Result<T> {
+    fun error(code: Int, msg: String): MResult<T> {
         this.code = code
         this.msg = msg
         this.data = null

@@ -1,10 +1,10 @@
-package vip.qsos.ktorm.localupload.service.impl
+package vip.qsos.ktorm.module.tweet.service.impl
 
 import me.liuwj.ktorm.entity.findAll
 import org.springframework.stereotype.Service
-import vip.qsos.ktorm.localupload.entity.Employees
-import vip.qsos.ktorm.localupload.entity.TableEmployee
-import vip.qsos.ktorm.localupload.service.TestService
+import vip.qsos.ktorm.module.tweet.entity.DBEmployees
+import vip.qsos.ktorm.module.tweet.entity.TableEmployee
+import vip.qsos.ktorm.module.tweet.service.TestService
 
 /**
  * @author : 华清松
@@ -15,7 +15,7 @@ import vip.qsos.ktorm.localupload.service.TestService
 open class TestServiceImpl : TestService {
 
     override fun findAll(): List<TableEmployee> {
-        return Employees.findAll()
+        return DBEmployees.findAll()
     }
 
     override fun inset() {

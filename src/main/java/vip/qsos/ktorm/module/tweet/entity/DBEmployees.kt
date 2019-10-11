@@ -1,4 +1,4 @@
-package vip.qsos.ktorm.localupload.entity
+package vip.qsos.ktorm.module.tweet.entity
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
@@ -18,7 +18,7 @@ private const val TAB_NAME = "t_employee"
  * @date : 2019-05-17
  * @description : TODO 类说明，描述此类的类型和用途
  */
-object Employees : BaseTable<TableEmployee>(TAB_NAME) {
+object DBEmployees : BaseTable<TableEmployee>(TAB_NAME) {
     val id by int("id").primaryKey()
     val name by varchar("name")
     val job by varchar("job")

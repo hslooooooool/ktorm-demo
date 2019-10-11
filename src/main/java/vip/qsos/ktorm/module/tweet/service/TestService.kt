@@ -1,6 +1,6 @@
-package vip.qsos.ktorm.localupload.service
+package vip.qsos.ktorm.module.tweet.service
 
-import vip.qsos.ktorm.localupload.entity.TableEmployee
+import vip.qsos.ktorm.module.tweet.entity.TableEmployee
 
 /**
  * @author : 华清松
