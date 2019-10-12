@@ -10,7 +10,7 @@ package vip.qsos.ktorm.module.chat.entity
  * @param sexuality 用户性别
  */
 data class ChatUser(
-        var userId: Long,
+        var userId: Int = -1,
         var userName: String,
         var avatar: String? = null,
         var birth: String? = null,

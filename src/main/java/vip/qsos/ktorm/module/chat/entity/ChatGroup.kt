@@ -12,7 +12,7 @@ package vip.qsos.ktorm.module.chat.entity
  */
 data class ChatGroup(
         /** @see ChatSession.sessionId */
-        val groupId: Long,
+        val groupId: Int,
         val name: String,
         val createTime: Long,
         val notice: String? = null

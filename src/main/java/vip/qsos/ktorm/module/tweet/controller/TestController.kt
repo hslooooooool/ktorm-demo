@@ -9,7 +9,8 @@ import vip.qsos.ktorm.module.tweet.entity.DBEmployees
 import vip.qsos.ktorm.module.tweet.entity.TableEmployee
 import vip.qsos.ktorm.util.MResult
 
-@RestController(value = "/tweet")
+@RestController
+@RequestMapping("/tweet")
 open class TestController {
 
     @PostMapping("/add")

@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.schema.BaseTable
 import me.liuwj.ktorm.schema.int
-import me.liuwj.ktorm.schema.long
 import me.liuwj.ktorm.schema.varchar
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
@@ -21,16 +20,14 @@ private const val TAB_NAME = "t_chat_message"
  */
 object DBChatMessage : BaseTable<TableChatMessage>(TAB_NAME) {
     val id by int("id").primaryKey()
-    val sessionId by long("session_id")
-    val messageId by long("message_id")
-    val sequence by long("sequence")
+    val sessionId by int("session_id")
+    val sequence by int("sequence")
     val content by varchar("content")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatMessage {
         return TableChatMessage(
-                id = row[id],
+                id = row[id]!!,
                 sessionId = row[sessionId] ?: -1,
-                messageId = row[messageId] ?: -1,
                 sequence = row[sequence] ?: -1,
                 content = row[content] ?: ""
         )
@@ -45,19 +42,15 @@ data class TableChatMessage(
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @ApiModelProperty(name = "id", value = "聊天消息ID", dataType = "Int")
-        var id: Int? = null,
+        var id: Int,
 
         @Column(name = "session_id")
-        @ApiModelProperty(name = "sessionId", value = "会话ID", dataType = "Long")
-        val sessionId: Long,
-
-        @Column(name = "message_id")
-        @ApiModelProperty(name = "messageId", value = "消息ID", dataType = "Long")
-        val messageId: Long,
+        @ApiModelProperty(name = "sessionId", value = "会话ID", dataType = "Int")
+        val sessionId: Int,
 
         @Column(name = "sequence")
-        @ApiModelProperty(name = "sequence", value = "消息顺序", dataType = "Long")
-        val sequence: Long,
+        @ApiModelProperty(name = "sequence", value = "消息顺序", dataType = "Int")
+        val sequence: Int,
 
         @Column(name = "content")
         @ApiModelProperty(name = "content", value = "聊天消息内容", dataType = "String")

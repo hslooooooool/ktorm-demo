@@ -12,9 +12,9 @@ import com.google.gson.Gson
  */
 data class ChatMessage(
         /**@see ChatSession.sessionId*/
-        val sessionId: Long = -1L,
-        var messageId: Long = -1L,
-        var sequence: Long = -1L,
+        val sessionId: Int = -1,
+        var messageId: Int = -1,
+        var sequence: Int = -1,
         var content: ChatContent = ChatContent()
 ) {
 

@@ -1,6 +1,10 @@
 package vip.qsos.ktorm.module.chat.controller
 
-import vip.qsos.ktorm.module.chat.entity.*
+import org.springframework.web.bind.annotation.RequestHeader
+import vip.qsos.ktorm.module.chat.entity.ChatGroup
+import vip.qsos.ktorm.module.chat.entity.ChatMessage
+import vip.qsos.ktorm.module.chat.entity.ChatSession
+import vip.qsos.ktorm.module.chat.entity.ChatUser
 import vip.qsos.ktorm.util.MResult
 
 /**
@@ -15,31 +19,25 @@ interface IChatModel {
          * @param sessionId 会话ID
          * @return 会话数据
          * */
-        fun getSessionById(sessionId: Long): MResult<ChatSession>
+        fun getSessionById(sessionId: Int): MResult<ChatSession>
 
         /**获取消息数据
          * @param messageId 消息ID
          * @return 消息数据
          * */
-        fun getMessageById(messageId: Long): MResult<ChatMessage>
+        fun getMessageById(messageId: Int): MResult<ChatMessage>
 
         /**获取用户数据
          * @param userId 用户ID
          * @return 用户数据
          * */
-        fun getUserById(userId: Long): MResult<ChatUser>
+        fun getUserById(@RequestHeader(value = "userId") userId: Int): MResult<ChatUser>
 
         /**获取聊天群数据
          * @param groupId 聊天群ID
          * @return 聊天群数据
          * */
-        fun getGroupById(groupId: Long): MResult<ChatGroup>
-
-        /**获取消息内容数据
-         * @param contentId 消息内容ID
-         * @return 消息内容数据
-         * */
-        fun getContentById(contentId: Long): MResult<ChatContent>
+        fun getGroupById(groupId: Int): MResult<ChatGroup>
 
     }
 
@@ -49,55 +47,61 @@ interface IChatModel {
          * @param sessionId 会话ID
          * @return 聊天群数据
          * */
-        fun getGroupByBySessionId(sessionId: Long): MResult<ChatGroup>
+        fun getGroupByBySessionId(sessionId: Int): MResult<ChatGroup>
 
         /**获取会话下的用户列表
          * @param sessionId 会话ID
          * @return 用户列表
          * */
-        fun getUserListBySessionId(sessionId: Long): MResult<List<ChatUser>>
+        fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUser>>
 
         /**获取会话下的消息列表
          * @param sessionId 会话ID
          * @return 会话下的消息列表
          * */
-        fun getMessageListBySessionId(sessionId: Long): MResult<List<ChatMessage>>
+        fun getMessageListBySessionId(sessionId: Int): MResult<List<ChatMessage>>
 
         /**获取用户发送的消息
          * @param userId 用户ID
          * @return 用户发送的消息
          * */
-        fun getMessageListByUserId(userId: Long): MResult<List<ChatMessage>>
+        fun getMessageListByUserId(@RequestHeader(value = "userId") userId: Int): MResult<List<ChatMessage>>
 
         /**获取用户订阅的会话
          * @param userId 用户ID
          * @return 用户订阅的会话
          * */
-        fun getSessionListByUserId(userId: Long): MResult<List<ChatSession>>
+        fun getSessionListByUserId(@RequestHeader(value = "userId") userId: Int): MResult<List<ChatSession>>
 
     }
 
     interface Post {
 
+        /**创建用户
+         * @param user 用户
+         * @return 用户信息
+         * */
+        fun createUser(user: ChatUser): MResult<ChatUser>
+
         /**发送消息
          * @param message 消息数据
          * @return 消息数据
          * */
-        fun sendMessage(message: ChatMessage): MResult<ChatMessage>
+        fun sendMessage(@RequestHeader(value = "userId") userId: Int, message: ChatMessage): MResult<ChatMessage>
 
         /**创建会话,可同时往会话发送一条消息,适用于发起单聊/群聊/分享等场景
          * @param userIdList 用户ID集合
          * @param message 发送的消息
          * @return 会话数据
          * */
-        fun createSession(userIdList: List<Long>, message: ChatMessage? = null): MResult<ChatSession>
+        fun createSession(userIdList: List<Int>, message: ChatMessage? = null): MResult<ChatSession>
 
         /**往已有会话中增加用户
          * @param userIdList 被添加用户ID集合
          * @param sessionId 会话ID
          * @return 加入的会话数据
          * */
-        fun addUserListToSession(userIdList: List<Long>, sessionId: Long): MResult<ChatSession>
+        fun addUserListToSession(userIdList: List<Int>, sessionId: Int): MResult<ChatSession>
 
         /**更新聊天群公告
          * @param notice 需更新的聊天群公告
@@ -118,18 +122,18 @@ interface IChatModel {
         /**解散会话
          * @param sessionId 会话ID
          * */
-        fun deleteSession(sessionId: Long): MResult<Boolean>
+        fun deleteSession(sessionId: Int): MResult<Boolean>
 
         /**将用户移除会话
          * @param sessionId 会话ID
          * @param userId 需要移除的用户ID
          * */
-        fun deleteUser(sessionId: Long, userId: Long): MResult<Boolean>
+        fun deleteUser(sessionId: Int, @RequestHeader(value = "userId") userId: Int): MResult<Boolean>
 
         /**撤回消息
          * @param messageId 消息ID
          * */
-        fun deleteMessage(messageId: Long): MResult<Boolean>
+        fun deleteMessage(messageId: Int): MResult<Boolean>
 
     }
 }

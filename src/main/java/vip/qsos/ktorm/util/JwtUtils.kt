@@ -23,7 +23,7 @@ object JwtUtils {
     /**
      * 生成jwt token
      */
-    fun generateToken(userId: Long?): String {
+    fun generateToken(userId: Int?): String {
         val nowDate = Date()
         // 过期时间
         val expireDate = Date(nowDate.time + expireTime * 1000)
