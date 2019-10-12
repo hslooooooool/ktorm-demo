@@ -1,6 +1,7 @@
 package vip.qsos.ktorm.module.chat.entity
 
 import com.google.gson.Gson
+import org.springframework.web.bind.annotation.RequestBody
 
 /**
  * @author : 华清松
@@ -15,7 +16,7 @@ data class ChatMessage(
         val sessionId: Int = -1,
         var messageId: Int = -1,
         var sequence: Int = -1,
-        var content: ChatContent = ChatContent()
+        var content: ChatContent
 ) {
 
     fun contentToJson(): String {
@@ -28,3 +29,9 @@ data class ChatMessage(
         }
     }
 }
+
+data class MChatMessage(
+        val user: ChatUser,
+        val createTime: Long,
+        val message: ChatMessage
+)

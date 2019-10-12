@@ -19,14 +19,14 @@ private const val TAB_NAME = "t_chat_message"
  * @description : TODO 类说明，描述此类的类型和用途
  */
 object DBChatMessage : BaseTable<TableChatMessage>(TAB_NAME) {
-    val id by int("id").primaryKey()
+    val messageId by int("id").primaryKey()
     val sessionId by int("session_id")
     val sequence by int("sequence")
     val content by varchar("content")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatMessage {
         return TableChatMessage(
-                id = row[id]!!,
+                messageId = row[messageId]!!,
                 sessionId = row[sessionId] ?: -1,
                 sequence = row[sequence] ?: -1,
                 content = row[content] ?: ""
@@ -41,8 +41,8 @@ data class TableChatMessage(
         @Id
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @ApiModelProperty(name = "id", value = "聊天消息ID", dataType = "Int")
-        var id: Int,
+        @ApiModelProperty(name = "messageId", value = "聊天消息ID", dataType = "Int")
+        var messageId: Int,
 
         @Column(name = "session_id")
         @ApiModelProperty(name = "sessionId", value = "会话ID", dataType = "Int")

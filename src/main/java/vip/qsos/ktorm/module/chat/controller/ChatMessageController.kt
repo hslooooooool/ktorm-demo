@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiOperation
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.findById
 import me.liuwj.ktorm.entity.findList
-import me.liuwj.ktorm.entity.findListByIds
+import me.liuwj.ktorm.entity.findOne
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.module.tweet.entity.DBEmployees
@@ -24,7 +24,7 @@ open class ChatMessageController : IChatModelConfig {
     @ApiOperation(value = "获取消息数据")
     open override fun getMessageById(messageId: Int): MResult<ChatMessage> {
         val message = DBChatMessage.findById(messageId)?.let {
-            ChatMessage(it.sessionId, it.id, it.sequence, ChatMessage.jsonToContent(it.content))
+            ChatMessage(it.sessionId, it.messageId, it.sequence, ChatMessage.jsonToContent(it.content))
         }
         return if (message == null) {
             MResult<ChatMessage>().error(500, "无法找到")
@@ -67,34 +67,55 @@ open class ChatMessageController : IChatModelConfig {
 
     @GetMapping("/message/getMessageListBySessionId")
     @ApiOperation(value = "获取会话下的消息列表")
-    open override fun getMessageListBySessionId(sessionId: Int): MResult<List<ChatMessage>> {
-        val list = DBChatMessage.findList {
+    open override fun getMessageListBySessionId(sessionId: Int): MResult<List<MChatMessage>> {
+        val list: ArrayList<MChatMessage> = arrayListOf()
+        DBChatMessage.findList {
             it.sessionId eq sessionId
-        }.map {
-            ChatMessage(it.sessionId, it.id, it.sequence, ChatMessage.jsonToContent(it.content))
+        }.map { msg ->
+            DBChatUserWithMessage.findOne {
+                it.messageId eq msg.messageId
+            }?.let { v ->
+                val createTime = v.createTime
+                val message = ChatMessage(msg.sessionId, msg.messageId, msg.sequence, ChatMessage.jsonToContent(msg.content))
+                DBChatUser.findOne {
+                    it.userId eq v.userId
+                }?.let {
+                    ChatUser(userId = it.userId, userName = it.userName, avatar = it.avatar, birth = it.birth,
+                            sexuality = it.sexuality)
+                }?.let { user ->
+                    list.add(MChatMessage(user = user, message = message, createTime = createTime))
+                }
+            }
         }
-        return MResult<List<ChatMessage>>().result(list)
+        list.sortByDescending {
+            it.message.sequence
+        }
+        return MResult<List<MChatMessage>>().result(list)
     }
 
     @GetMapping("/message/getMessageListByUserId")
     @ApiOperation(value = "获取用户发送的消息")
-    open override fun getMessageListByUserId(userId: Int): MResult<List<ChatMessage>> {
+    open override fun getMessageListByUserId(userId: Int): MResult<List<MChatMessage>> {
         val list = DBChatUserWithMessage.findList {
             it.userId eq userId
-        }.map {
-            it.messageId
         }
-        var messages: List<ChatMessage>? = null
-        if (list.isNotEmpty()) {
-            messages = DBChatMessage.findListByIds(list).map {
-                ChatMessage(sessionId = it.sessionId, messageId = it.id, sequence = it.sequence, content = ChatMessage.jsonToContent(it.content))
+        val messages: ArrayList<MChatMessage> = arrayListOf()
+        list.forEach {
+            val createTime = it.createTime
+            val user = DBChatUser.findById(it.userId)!!.let { user ->
+                ChatUser(userId = user.userId, userName = user.userName, avatar = user.avatar, birth = user.birth,
+                        sexuality = user.sexuality)
             }
+            val message = DBChatMessage.findById(it.messageId)!!.let { msg ->
+                ChatMessage(sessionId = msg.sessionId, messageId = msg.messageId, sequence = msg.sequence,
+                        content = ChatMessage.jsonToContent(msg.content))
+            }
+            messages.add(MChatMessage(user = user, message = message, createTime = createTime))
         }
-        return if (messages == null) {
-            MResult<List<ChatMessage>>().error(500, "无法找到")
-        } else {
-            MResult<List<ChatMessage>>().result(messages)
+        messages.sortByDescending {
+            it.message.sequence
         }
+        return MResult<List<MChatMessage>>().result(messages)
     }
 
     @GetMapping("/session/getSessionListByUserId")
@@ -119,17 +140,12 @@ open class ChatMessageController : IChatModelConfig {
     @PostMapping("/message/sendMessage")
     @ApiOperation(value = "发送消息")
     open override fun sendMessage(userId: Int, message: ChatMessage): MResult<ChatMessage> {
-        message.content = ChatContent()
-        val map = HashMap<String, Any?>()
-        map["contentType"] = 0
-        map["content"] = "测试消息内容"
-        message.content.fields = map
         if (message.messageId < 0) {
             // 插入
             val messages = DBChatMessage.findList {
                 it.sessionId eq message.sessionId
             }.map {
-                ChatMessage(it.sessionId, it.id, it.sequence, ChatMessage.jsonToContent(it.content))
+                ChatMessage(it.sessionId, it.messageId, it.sequence, ChatMessage.jsonToContent(it.content))
             }.sortedBy {
                 it.sequence
             }
@@ -147,6 +163,7 @@ open class ChatMessageController : IChatModelConfig {
             DBChatUserWithMessage.insert {
                 it.userId to userId
                 it.messageId to mId
+                it.createTime to System.currentTimeMillis()
             }
         } else {
             // 更新
@@ -154,7 +171,7 @@ open class ChatMessageController : IChatModelConfig {
                 it.content to message.contentToJson()
 
                 where {
-                    it.id eq message.messageId
+                    it.messageId eq message.messageId
                 }
             }
         }

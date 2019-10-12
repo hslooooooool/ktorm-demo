@@ -1,10 +1,8 @@
 package vip.qsos.ktorm.module.chat.controller
 
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
-import vip.qsos.ktorm.module.chat.entity.ChatGroup
-import vip.qsos.ktorm.module.chat.entity.ChatMessage
-import vip.qsos.ktorm.module.chat.entity.ChatSession
-import vip.qsos.ktorm.module.chat.entity.ChatUser
+import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.util.MResult
 
 /**
@@ -59,13 +57,13 @@ interface IChatModel {
          * @param sessionId 会话ID
          * @return 会话下的消息列表
          * */
-        fun getMessageListBySessionId(sessionId: Int): MResult<List<ChatMessage>>
+        fun getMessageListBySessionId(sessionId: Int): MResult<List<MChatMessage>>
 
         /**获取用户发送的消息
          * @param userId 用户ID
          * @return 用户发送的消息
          * */
-        fun getMessageListByUserId(@RequestHeader(value = "userId") userId: Int): MResult<List<ChatMessage>>
+        fun getMessageListByUserId(@RequestHeader(value = "userId") userId: Int): MResult<List<MChatMessage>>
 
         /**获取用户订阅的会话
          * @param userId 用户ID
@@ -81,20 +79,20 @@ interface IChatModel {
          * @param user 用户
          * @return 用户信息
          * */
-        fun createUser(user: ChatUser): MResult<ChatUser>
+        fun createUser(@RequestBody user: ChatUser): MResult<ChatUser>
 
         /**发送消息
          * @param message 消息数据
          * @return 消息数据
          * */
-        fun sendMessage(@RequestHeader(value = "userId") userId: Int, message: ChatMessage): MResult<ChatMessage>
+        fun sendMessage(@RequestHeader(value = "userId") userId: Int, @RequestBody message: ChatMessage): MResult<ChatMessage>
 
         /**创建会话,可同时往会话发送一条消息,适用于发起单聊/群聊/分享等场景
          * @param userIdList 用户ID集合
          * @param message 发送的消息
          * @return 会话数据
          * */
-        fun createSession(userIdList: List<Int>, message: ChatMessage? = null): MResult<ChatSession>
+        fun createSession(userIdList: List<Int>, @RequestBody message: ChatMessage? = null): MResult<ChatSession>
 
         /**往已有会话中增加用户
          * @param userIdList 被添加用户ID集合

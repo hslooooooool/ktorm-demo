@@ -41,7 +41,7 @@ object DBChatUser : BaseTable<TableChatUser>(TAB_NAME) {
 @ApiModel(value = "聊天用户实体")
 data class TableChatUser(
         @Id
-        @Column(name = "user_id")
+        @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @ApiModelProperty(name = "userId", value = "用户ID", dataType = "Int")
         val userId: Int,

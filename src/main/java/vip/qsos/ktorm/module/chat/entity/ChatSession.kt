@@ -10,6 +10,6 @@ package vip.qsos.ktorm.module.chat.entity
  * @see ChatGroup
  */
 data class ChatSession(
-        var sessionId: Long,
+        var sessionId: Int = -1,
         var type: ChatType
 )
