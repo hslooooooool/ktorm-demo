@@ -15,7 +15,7 @@ private const val TAB_NAME = "t_chat_session"
 
 /**
  * @author : 华清松
- * @description : 聊天用户表
+ * @description : 聊天会话表
  */
 object DBChatSession : BaseTable<TableChatSession>(TAB_NAME) {
     val sessionId by int("id").primaryKey()
@@ -42,5 +42,4 @@ data class TableChatSession(
         @Column(name = "chat_type")
         @ApiModelProperty(name = "chat_type", value = "会话类型", dataType = "String")
         val type: String
-
 )
