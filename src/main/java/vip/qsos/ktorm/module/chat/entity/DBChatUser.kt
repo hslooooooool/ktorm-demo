@@ -61,5 +61,4 @@ data class TableChatUser(
         @Column(name = "sexuality")
         @ApiModelProperty(name = "sexuality", value = "性别,true(1)男 false(0)女 null未知", dataType = "Boolean")
         val sexuality: Boolean?
-
 )
