@@ -17,7 +17,15 @@ open class ChatMessageController : IChatModelConfig {
     @GetMapping("/session")
     @ApiOperation(value = "获取会话信息")
     open override fun getSessionById(sessionId: Int): MResult<ChatSession> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        var session: ChatSession? = null
+        DBChatSession.findById(sessionId)?.let {
+            session = ChatSession(sessionId = it.sessionId, type = ChatType.valueOf(it.type))
+        }
+        return if (session == null) {
+            MResult<ChatSession>().error(500, "无法找到")
+        } else {
+            MResult<ChatSession>().result(session!!)
+        }
     }
 
     @GetMapping("/message")
@@ -180,8 +188,24 @@ open class ChatMessageController : IChatModelConfig {
 
     @PutMapping("/session/createSession")
     @ApiOperation(value = "创建会话")
-    open override fun createSession(userIdList: List<Int>, message: ChatMessage?): MResult<ChatSession> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    open override fun createSession(userId: Int, userIdList: List<Int>, message: ChatMessage?): MResult<ChatSession> {
+        val session = ChatSession(
+                type = if (userIdList.size > 1) ChatType.GROUP else ChatType.SINGLE
+        )
+        val id = DBChatSession.insertAndGenerateKey {
+            it.type to session.type
+        }
+        session.sessionId = id as Int
+        message?.let {
+            it.sessionId = id
+            val result = sendMessage(userId, it)
+            return if (result.code == 200) {
+                MResult<ChatSession>().result(session)
+            } else {
+                MResult<ChatSession>().error(result.code, result.msg)
+            }
+        }
+        return MResult<ChatSession>().result(session)
     }
 
     @PostMapping("/session/addUserListToSession")

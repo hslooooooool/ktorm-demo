@@ -92,7 +92,7 @@ interface IChatModel {
          * @param message 发送的消息
          * @return 会话数据
          * */
-        fun createSession(userIdList: List<Int>, @RequestBody message: ChatMessage? = null): MResult<ChatSession>
+        fun createSession(@RequestHeader(value = "userId") userId: Int, userIdList: List<Int>, @RequestBody message: ChatMessage? = null): MResult<ChatSession>
 
         /**往已有会话中增加用户
          * @param userIdList 被添加用户ID集合

@@ -12,5 +12,5 @@ enum class ChatType {
     SINGLE,
     GROUP,
     NOTICE,
-    SUBSCRIPTION
+    SUBSCRIPTION;
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
  */
 data class ChatMessage(
         /**@see ChatSession.sessionId*/
-        val sessionId: Int = -1,
+        var sessionId: Int = -1,
         var messageId: Int = -1,
         var sequence: Int = -1,
         var content: ChatContent
