@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.findById
 import me.liuwj.ktorm.entity.findList
+import me.liuwj.ktorm.entity.findListByIds
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.module.chat.entity.*
@@ -34,6 +35,18 @@ open class ChatMessageController : IChatModelConfig {
         } else {
             MResult<ChatMessage>().result(message)
         }
+    }
+
+    override fun getGroupWithMe(userId: Int): MResult<List<ChatGroup>> {
+        val groupIds = DBChatUserWithSession.findList {
+            it.userId eq userId
+        }.map {
+            it.sessionId
+        }.toSet()
+        val groupList = DBChatGroup.findListByIds(groupIds).map {
+            ChatGroup(groupId = it.groupId, name = it.name, createTime = it.createTime, notice = it.notice)
+        }
+        return MResult<List<ChatGroup>>().result(groupList)
     }
 
     override fun getUserById(userId: Int): MResult<ChatUser> {
@@ -168,18 +181,27 @@ open class ChatMessageController : IChatModelConfig {
     }
 
     override fun createSession(userId: Int, data: IChatModel.Post.FormCreateSession): MResult<ChatSession> {
+        val createTime = System.currentTimeMillis()
+
         val session = ChatSession(
-                type = if (data.userIdList.size > 1) ChatType.GROUP else ChatType.SINGLE
+                type = if (data.userIdList.size > 2) ChatType.GROUP else ChatType.SINGLE
         )
         val sessionId = DBChatSession.insertAndGenerateKey {
             it.type to session.type.ordinal
+        } as Int
+        session.sessionId = sessionId
+
+        DBChatGroup.insert {
+            it.groupId to sessionId
+            it.name to "$createTime【群】"
+            it.createTime to createTime
         }
-        session.sessionId = sessionId as Int
+
         data.userIdList.forEach { id ->
             DBChatUserWithSession.insert {
-                it.sessionId to session.sessionId
+                it.sessionId to sessionId
                 it.userId to id
-                it.createTime to System.currentTimeMillis()
+                it.createTime to createTime
             }
         }
         data.message?.let {

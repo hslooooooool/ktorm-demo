@@ -63,6 +63,10 @@ interface IChatModel {
         @ApiOperation(value = "获取会话下的用户列表")
         fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUser>>
 
+        @GetMapping("/group/getGroupWithMe")
+        @ApiOperation(value = "获取用户所在的所有群列表")
+        fun getGroupWithMe(@RequestHeader userId: Int): MResult<List<ChatGroup>>
+
         /**获取会话下的消息列表
          * @param sessionId 会话ID
          * @return 会话下的消息列表
