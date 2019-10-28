@@ -39,7 +39,7 @@ spring:
     # 配置是否将执行的 SQL 输出到日志
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 
 app:
   # APP模块，是通过jwt认证的，如果要使用APP模块，则需要修改【加密秘钥】

@@ -14,23 +14,18 @@ import vip.qsos.ktorm.util.MResult
 @RequestMapping("/chat")
 open class ChatMessageController : IChatModelConfig {
 
-    @GetMapping("/session")
-    @ApiOperation(value = "获取会话信息")
-    open override fun getSessionById(sessionId: Int): MResult<ChatSession> {
-        var session: ChatSession? = null
-        DBChatSession.findById(sessionId)?.let {
-            session = ChatSession(sessionId = it.sessionId, type = ChatType.valueOf(it.type))
+    override fun getSessionById(sessionId: Int): MResult<ChatSession> {
+        val session = DBChatSession.findById(sessionId)?.let {
+            ChatSession(sessionId = it.sessionId, type = it.type)
         }
         return if (session == null) {
             MResult<ChatSession>().error(500, "无法找到")
         } else {
-            MResult<ChatSession>().result(session!!)
+            MResult<ChatSession>().result(session)
         }
     }
 
-    @GetMapping("/message")
-    @ApiOperation(value = "获取消息数据")
-    open override fun getMessageById(messageId: Int): MResult<ChatMessage> {
+    override fun getMessageById(messageId: Int): MResult<ChatMessage> {
         val message = DBChatMessage.findById(messageId)?.let {
             ChatMessage(it.sessionId, it.messageId, it.sequence, ChatMessage.jsonToContent(it.content))
         }
@@ -41,9 +36,7 @@ open class ChatMessageController : IChatModelConfig {
         }
     }
 
-    @GetMapping("/user")
-    @ApiOperation(value = "获取用户信息")
-    open override fun getUserById(userId: Int): MResult<ChatUser> {
+    override fun getUserById(userId: Int): MResult<ChatUser> {
         var user: ChatUser? = null
         DBChatUser.findById(userId)?.let {
             user = ChatUser(userId = it.userId, userName = it.userName, avatar = it.avatar, birth = it.birth, sexuality = it.sexuality)
@@ -57,25 +50,21 @@ open class ChatMessageController : IChatModelConfig {
 
     @GetMapping("/group")
     @ApiOperation(value = "获取群信息")
-    open override fun getGroupById(groupId: Int): MResult<ChatGroup> {
+    override fun getGroupById(groupId: Int): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/group/getGroupByBySessionId")
     @ApiOperation(value = "获取会话对应的群信息")
-    open override fun getGroupByBySessionId(sessionId: Int): MResult<ChatGroup> {
+    override fun getGroupByBySessionId(sessionId: Int): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    @GetMapping("/user/getUserListBySessionId")
-    @ApiOperation(value = "获取会话下的用户列表")
-    open override fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUser>> {
+    override fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUser>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    @GetMapping("/message/getMessageListBySessionId")
-    @ApiOperation(value = "获取会话下的消息列表")
-    open override fun getMessageListBySessionId(sessionId: Int): MResult<List<MChatMessage>> {
+    override fun getMessageListBySessionId(sessionId: Int): MResult<List<MChatMessage>> {
         val list: ArrayList<MChatMessage> = arrayListOf()
         DBChatMessage.findList {
             it.sessionId eq sessionId
@@ -101,9 +90,7 @@ open class ChatMessageController : IChatModelConfig {
         return MResult<List<MChatMessage>>().result(list)
     }
 
-    @GetMapping("/message/getMessageListByUserId")
-    @ApiOperation(value = "获取用户发送的消息")
-    open override fun getMessageListByUserId(userId: Int): MResult<List<MChatMessage>> {
+    override fun getMessageListByUserId(userId: Int): MResult<List<MChatMessage>> {
         val list = DBChatUserWithMessage.findList {
             it.userId eq userId
         }
@@ -126,14 +113,10 @@ open class ChatMessageController : IChatModelConfig {
         return MResult<List<MChatMessage>>().result(messages)
     }
 
-    @GetMapping("/session/getSessionListByUserId")
-    @ApiOperation(value = "获取用户订阅的会话")
-    open override fun getSessionListByUserId(userId: Int): MResult<List<ChatSession>> {
+    override fun getSessionListByUserId(userId: Int): MResult<List<ChatSession>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    @PostMapping("/user/createUser")
-    @ApiOperation(value = "创建用户")
     override fun createUser(user: ChatUser): MResult<ChatUser> {
         val id = DBChatUser.insertAndGenerateKey {
             it.userName to user.userName
@@ -145,9 +128,7 @@ open class ChatMessageController : IChatModelConfig {
         return MResult<ChatUser>().result(user)
     }
 
-    @PostMapping("/message/sendMessage")
-    @ApiOperation(value = "发送消息")
-    open override fun sendMessage(userId: Int, message: ChatMessage): MResult<ChatMessage> {
+    override fun sendMessage(userId: Int, message: ChatMessage): MResult<ChatMessage> {
         if (message.messageId < 0) {
             // 插入
             val messages = DBChatMessage.findList {
@@ -186,18 +167,23 @@ open class ChatMessageController : IChatModelConfig {
         return MResult<ChatMessage>().result(message)
     }
 
-    @PutMapping("/session/createSession")
-    @ApiOperation(value = "创建会话")
-    open override fun createSession(userId: Int, userIdList: List<Int>, message: ChatMessage?): MResult<ChatSession> {
+    override fun createSession(userId: Int, data: IChatModel.Post.FormCreateSession): MResult<ChatSession> {
         val session = ChatSession(
-                type = if (userIdList.size > 1) ChatType.GROUP else ChatType.SINGLE
+                type = if (data.userIdList.size > 1) ChatType.GROUP else ChatType.SINGLE
         )
-        val id = DBChatSession.insertAndGenerateKey {
-            it.type to session.type
+        val sessionId = DBChatSession.insertAndGenerateKey {
+            it.type to session.type.ordinal
         }
-        session.sessionId = id as Int
-        message?.let {
-            it.sessionId = id
+        session.sessionId = sessionId as Int
+        data.userIdList.forEach { id ->
+            DBChatUserWithSession.insert {
+                it.sessionId to session.sessionId
+                it.userId to id
+                it.createTime to System.currentTimeMillis()
+            }
+        }
+        data.message?.let {
+            it.sessionId = sessionId
             val result = sendMessage(userId, it)
             return if (result.code == 200) {
                 MResult<ChatSession>().result(session)
@@ -208,39 +194,45 @@ open class ChatMessageController : IChatModelConfig {
         return MResult<ChatSession>().result(session)
     }
 
-    @PostMapping("/session/addUserListToSession")
-    @ApiOperation(value = "会话中增加用户")
-    open override fun addUserListToSession(userIdList: List<Int>, sessionId: Int): MResult<ChatSession> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun addUserListToSession(userId: Int, userIdList: List<Int>, sessionId: Int): MResult<ChatSession> {
+        val session = DBChatSession.findById(sessionId)?.let {
+            ChatSession(sessionId = it.sessionId, type = it.type)
+        } ?: return MResult<ChatSession>().error(500, "会话不存在")
+        userIdList.forEach { id ->
+            DBChatUserWithSession.insert {
+                it.sessionId to session.sessionId
+                it.userId to id
+                it.createTime to System.currentTimeMillis()
+            }
+        }
+        return MResult<ChatSession>().result(session)
     }
 
     @PutMapping("/group/updateGroupNotice")
     @ApiOperation(value = "更新群公告")
-    open override fun updateGroupNotice(notice: String): MResult<ChatGroup> {
+    override fun updateGroupNotice(notice: String): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PutMapping("/group/updateGroupName")
     @ApiOperation(value = "更新群名称")
-    open override fun updateGroupName(name: String): MResult<ChatGroup> {
+    override fun updateGroupName(name: String): MResult<ChatGroup> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PostMapping("/session")
     @ApiOperation(value = "删除会话")
-    open override fun deleteSession(sessionId: Int): MResult<Boolean> {
+    override fun deleteSession(sessionId: Int): MResult<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @DeleteMapping("/user")
     @ApiOperation(value = "删除用户")
-    open override fun deleteUser(sessionId: Int, userId: Int): MResult<Boolean> {
+    override fun deleteUser(sessionId: Int, userId: Int): MResult<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    @DeleteMapping("/message")
-    @ApiOperation(value = "删除(撤销)消息")
-    open override fun deleteMessage(messageId: Int): MResult<Boolean> {
+    override fun deleteMessage(messageId: Int): MResult<Boolean> {
         DBEmployees.delete { it.managerId.eq(messageId.toInt()) }
         return MResult<Boolean>().result(true)
     }

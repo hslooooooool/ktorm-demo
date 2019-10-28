@@ -11,14 +11,14 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 
-private const val TAB_NAME = "t_chat_user_with_message"
+private const val TAB_NAME = "t_chat_user_with_session"
 
 /**
  * @author : 华清松
  * @description : 聊天用户表
  */
 object DBChatUserWithSession : BaseTable<TableChatUserWithSession>(TAB_NAME) {
-    val id by int("id").primaryKey()
+    private val id by int("id").primaryKey()
     val userId by int("user_id")
     val sessionId by int("session_id")
     val createTime by long("create_time")

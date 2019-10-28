@@ -13,4 +13,12 @@ enum class ChatType {
     GROUP,
     NOTICE,
     SUBSCRIPTION;
+
+    companion object {
+        fun getEnumByIndex(index: Int): ChatType {
+            return values().find {
+                it.ordinal == index
+            }!!
+        }
+    }
 }
