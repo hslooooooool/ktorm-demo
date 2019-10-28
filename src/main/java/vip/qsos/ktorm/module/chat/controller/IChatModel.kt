@@ -1,5 +1,7 @@
 package vip.qsos.ktorm.module.chat.controller
 
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 import io.swagger.annotations.ApiOperation
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.module.chat.entity.*
@@ -124,8 +126,11 @@ interface IChatModel {
          * @param userIdList 用户ID集合
          * @param message 发送的消息，可为空
          * */
+        @ApiModel(description = "创建会话表单数据")
         data class FormCreateSession(
+                @ApiModelProperty(value = "用户ID集合", required = true)
                 val userIdList: List<Int>,
+                @ApiModelProperty(value = "消息", required = false)
                 val message: ChatMessage? = null
         )
 
