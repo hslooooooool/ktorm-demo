@@ -2,10 +2,7 @@ package vip.qsos.ktorm.module.chat.controller
 
 import io.swagger.annotations.ApiOperation
 import me.liuwj.ktorm.dsl.*
-import me.liuwj.ktorm.entity.findById
-import me.liuwj.ktorm.entity.findList
-import me.liuwj.ktorm.entity.findListByIds
-import me.liuwj.ktorm.entity.findOne
+import me.liuwj.ktorm.entity.*
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.module.tweet.entity.DBEmployees
@@ -24,6 +21,20 @@ open class ChatMessageController : IChatModelConfig {
         } else {
             MResult<ChatSession>().result(session)
         }
+    }
+
+    override fun getAllUser(userId: Int): MResult<List<ChatUser>> {
+        val users = DBChatUser.findAll()
+                .map {
+                    ChatUser(
+                            userId = it.userId,
+                            userName = it.userName,
+                            avatar = it.avatar,
+                            birth = it.birth,
+                            sexuality = it.sexuality
+                    )
+                }
+        return MResult<List<ChatUser>>().result(users)
     }
 
     override fun getMessageById(messageId: Int): MResult<ChatMessage> {
@@ -52,7 +63,10 @@ open class ChatMessageController : IChatModelConfig {
     override fun getUserById(userId: Int): MResult<ChatUser> {
         var user: ChatUser? = null
         DBChatUser.findById(userId)?.let {
-            user = ChatUser(userId = it.userId, userName = it.userName, avatar = it.avatar, birth = it.birth, sexuality = it.sexuality)
+            user = ChatUser(
+                    userId = it.userId, userName = it.userName, avatar = it.avatar,
+                    birth = it.birth, sexuality = it.sexuality
+            )
         }
         return if (user == null) {
             MResult<ChatUser>().error(500, "无法找到")
@@ -90,8 +104,10 @@ open class ChatMessageController : IChatModelConfig {
                 DBChatUser.findOne {
                     it.userId eq v.userId
                 }?.let {
-                    ChatUser(userId = it.userId, userName = it.userName, avatar = it.avatar, birth = it.birth,
-                            sexuality = it.sexuality)
+                    ChatUser(
+                            userId = it.userId, userName = it.userName, avatar = it.avatar,
+                            birth = it.birth, sexuality = it.sexuality
+                    )
                 }?.let { user ->
                     list.add(MChatMessage(user = user, message = message, createTime = createTime))
                 }
@@ -214,6 +230,10 @@ open class ChatMessageController : IChatModelConfig {
             }
         }
         return MResult<ChatSession>().result(session)
+    }
+
+    override fun hasSession(userIdList: List<Int>): ChatSession? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun addUserListToSession(userId: Int, userIdList: List<Int>, sessionId: Int): MResult<ChatSession> {

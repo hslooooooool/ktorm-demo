@@ -19,7 +19,7 @@ interface IChatModel {
          * @param sessionId 会话ID
          * @return 会话数据
          * */
-        @GetMapping("/session")
+        @GetMapping("/session/getSessionById")
         @ApiOperation(value = "获取会话信息")
         fun getSessionById(sessionId: Int): MResult<ChatSession>
 
@@ -27,7 +27,7 @@ interface IChatModel {
          * @param messageId 消息ID
          * @return 消息数据
          * */
-        @GetMapping("/message")
+        @GetMapping("/message/getMessageById")
         @ApiOperation(value = "获取消息数据")
         fun getMessageById(messageId: Int): MResult<ChatMessage>
 
@@ -35,7 +35,7 @@ interface IChatModel {
          * @param userId 用户ID
          * @return 用户数据
          * */
-        @GetMapping("/user")
+        @GetMapping("/user/getUserById")
         @ApiOperation(value = "获取用户信息")
         fun getUserById(@RequestHeader userId: Int): MResult<ChatUser>
 
@@ -44,6 +44,13 @@ interface IChatModel {
          * @return 聊天群数据
          * */
         fun getGroupById(groupId: Int): MResult<ChatGroup>
+
+        /**获取所有用户
+         * @return 所有用户
+         * */
+        @GetMapping("/user/getAllUser")
+        @ApiOperation(value = "获取所有用户")
+        fun getAllUser(@RequestHeader userId: Int): MResult<List<ChatUser>>
 
     }
 
@@ -125,6 +132,11 @@ interface IChatModel {
                 @RequestHeader userId: Int,
                 @RequestBody data: FormCreateSession
         ): MResult<ChatSession>
+
+        /**TODO【算法】校验会话是否已存在，判断条件：userIdList 范围内的用户拥有同一个 session 会话*/
+        fun hasSession(
+                userIdList: List<Int>
+        ): ChatSession?
 
         /**创建会话表单数据
          * @param userIdList 用户ID集合

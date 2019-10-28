@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.schema.BaseTable
 import me.liuwj.ktorm.schema.int
+import me.liuwj.ktorm.schema.text
 import me.liuwj.ktorm.schema.varchar
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
