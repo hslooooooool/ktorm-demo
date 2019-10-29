@@ -158,6 +158,9 @@ open class ChatMessageController : IChatModelConfig {
     }
 
     override fun sendMessage(userId: Int, message: ChatMessage): MResult<ChatMessage> {
+        if (message.sessionId < 0) {
+            return MResult<ChatMessage>().error(500, "会话不存在，发送失败")
+        }
         if (message.messageId < 0) {
             // 插入
             val messages = DBChatMessage.findList {
@@ -197,6 +200,13 @@ open class ChatMessageController : IChatModelConfig {
     }
 
     override fun createSession(userId: Int, data: IChatModel.Post.FormCreateSession): MResult<ChatSession> {
+
+        val oldSession = hasSession(data.userIdList)
+        if (oldSession.sessionId != -1) {
+            // 存在已有群，直接获取
+            return MResult<ChatSession>().result(oldSession)
+        }
+
         val createTime = System.currentTimeMillis()
 
         val session = ChatSession(
@@ -204,6 +214,7 @@ open class ChatMessageController : IChatModelConfig {
         )
         val sessionId = DBChatSession.insertAndGenerateKey {
             it.type to session.type.ordinal
+            it.hashCode to oldSession.hashCode
         } as Int
         session.sessionId = sessionId
 
@@ -232,8 +243,17 @@ open class ChatMessageController : IChatModelConfig {
         return MResult<ChatSession>().result(session)
     }
 
-    override fun hasSession(userIdList: List<Int>): ChatSession? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun hasSession(userIdList: List<Int>): ChatSession {
+        var hashCode = ""
+        userIdList.sorted().forEach {
+            hashCode += it.toString()
+        }
+        hashCode = hashCode.hashCode().toString()
+        return DBChatSession.findOne {
+            it.hashCode eq hashCode
+        }?.let {
+            ChatSession(sessionId = it.sessionId, type = it.type, hashCode = it.hashCode)
+        } ?: ChatSession(sessionId = -1, type = ChatType.SINGLE, hashCode = hashCode)
     }
 
     override fun addUserListToSession(userId: Int, userIdList: List<Int>, sessionId: Int): MResult<ChatSession> {

@@ -136,7 +136,7 @@ interface IChatModel {
         /**TODO【算法】校验会话是否已存在，判断条件：userIdList 范围内的用户拥有同一个 session 会话*/
         fun hasSession(
                 userIdList: List<Int>
-        ): ChatSession?
+        ): ChatSession
 
         /**创建会话表单数据
          * @param userIdList 用户ID集合

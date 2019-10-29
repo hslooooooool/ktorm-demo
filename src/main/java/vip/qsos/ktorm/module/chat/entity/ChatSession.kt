@@ -11,5 +11,6 @@ package vip.qsos.ktorm.module.chat.entity
  */
 data class ChatSession(
         var sessionId: Int = -1,
-        var type: ChatType
+        var type: ChatType,
+        var hashCode: String = ""
 )
