@@ -22,6 +22,13 @@ class MResult<T> {
         return this
     }
 
+    fun error(msg: String): MResult<T> {
+        this.code = 500
+        this.msg = msg
+        this.data = null
+        return this
+    }
+
     fun error(code: Int, msg: String): MResult<T> {
         this.code = code
         this.msg = msg

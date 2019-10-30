@@ -4,13 +4,9 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.schema.BaseTable
-import me.liuwj.ktorm.schema.boolean
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
-import javax.persistence.Column
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 private const val TAB_NAME = "t_chat_user"
 
@@ -19,14 +15,16 @@ private const val TAB_NAME = "t_chat_user"
  * @description : 聊天用户表
  */
 object DBChatUser : BaseTable<TableChatUser>(TAB_NAME) {
-    val userId by int("id").primaryKey()
+    val id by int("id").primaryKey()
+    val userId by int("user_id")
     val userName by varchar("user_name")
     val avatar by varchar("avatar")
     val birth by varchar("birth")
-    val sexuality by boolean("sexuality")
+    val sexuality by int("sexuality")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatUser {
         return TableChatUser(
+                id = row[id]!!,
                 userId = row[userId]!!,
                 userName = row[userName] ?: "用户" + row[userId],
                 avatar = row[avatar],
@@ -37,12 +35,18 @@ object DBChatUser : BaseTable<TableChatUser>(TAB_NAME) {
 }
 
 @javax.persistence.Entity
-@javax.persistence.Table(name = TAB_NAME)
+@javax.persistence.Table(
+        name = TAB_NAME,
+        indexes = [Index(name = "user_id", columnList = "user_id", unique = true)])
 @ApiModel(value = "聊天用户实体")
 data class TableChatUser(
         @Id
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @ApiModelProperty(name = "userId", value = "自增ID", dataType = "Int")
+        val id: Int,
+
+        @Column(name = "user_id")
         @ApiModelProperty(name = "userId", value = "用户ID", dataType = "Int")
         val userId: Int,
 
@@ -59,6 +63,6 @@ data class TableChatUser(
         val birth: String?,
 
         @Column(name = "sexuality")
-        @ApiModelProperty(name = "sexuality", value = "性别,true(1)男 false(0)女 null未知", dataType = "Boolean")
-        val sexuality: Boolean?
+        @ApiModelProperty(name = "sexuality", value = "性别,0女 1男 null未知", dataType = "Int")
+        val sexuality: Int?
 )
