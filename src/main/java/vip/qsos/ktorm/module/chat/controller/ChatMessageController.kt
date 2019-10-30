@@ -38,9 +38,7 @@ open class ChatMessageController : IChatModelConfig {
     }
 
     override fun getMessageById(messageId: Int): MResult<ChatMessage> {
-        val message = DBChatMessage.findById(messageId)?.let {
-            ChatMessage(it.sessionId, it.messageId, it.sequence, ChatMessage.jsonToContent(it.content))
-        }
+        val message = DBChatMessage.findById(messageId)?.toChatMessage()
         return if (message == null) {
             MResult<ChatMessage>().error(500, "无法找到")
         } else {
@@ -54,8 +52,20 @@ open class ChatMessageController : IChatModelConfig {
         }.map {
             it.sessionId
         }.toSet()
-        val groupList = DBChatGroup.findListByIds(groupIds).map {
-            ChatGroup(groupId = it.groupId, name = it.name, createTime = it.createTime, notice = it.notice)
+        val groupList = DBChatGroup.findListByIds(groupIds).map { group ->
+            val chatGroup = ChatGroup(
+                    groupId = group.groupId,
+                    name = group.name,
+                    createTime = group.createTime,
+                    avatar = group.avatar,
+                    notice = group.notice
+            )
+            chatGroup.lastMessage = group.lastMessageId?.let { messageId ->
+                DBChatMessage.findOne {
+                    it.messageId eq messageId
+                }?.toChatMessage()
+            }
+            chatGroup
         }
         return MResult<List<ChatGroup>>().result(groupList)
     }
@@ -100,7 +110,7 @@ open class ChatMessageController : IChatModelConfig {
                 it.messageId eq msg.messageId
             }?.let { v ->
                 val createTime = v.createTime
-                val message = ChatMessage(msg.sessionId, msg.messageId, msg.sequence, ChatMessage.jsonToContent(msg.content))
+                val message = msg.toChatMessage()
                 DBChatUser.findOne {
                     it.userId eq v.userId
                 }?.let {
@@ -130,10 +140,7 @@ open class ChatMessageController : IChatModelConfig {
                 ChatUser(userId = user.userId, userName = user.userName, avatar = user.avatar, birth = user.birth,
                         sexuality = user.sexuality)
             }
-            val message = DBChatMessage.findById(it.messageId)!!.let { msg ->
-                ChatMessage(sessionId = msg.sessionId, messageId = msg.messageId, sequence = msg.sequence,
-                        content = ChatMessage.jsonToContent(msg.content))
-            }
+            val message = DBChatMessage.findById(it.messageId)!!.toChatMessage()
             messages.add(MChatMessage(user = user, message = message, createTime = createTime))
         }
         messages.sortByDescending {
@@ -163,20 +170,8 @@ open class ChatMessageController : IChatModelConfig {
         }
         if (message.messageId < 0) {
             // 插入
-            val messages = DBChatMessage.findList {
-                it.sessionId eq message.sessionId
-            }.map {
-                ChatMessage(it.sessionId, it.messageId, it.sequence, ChatMessage.jsonToContent(it.content))
-            }.sortedBy {
-                it.sequence
-            }
-            if (messages.isNotEmpty()) {
-                message.sequence = messages.last().sequence + 1
-                message.messageId = messages.last().messageId + 1
-            }
             val mId = DBChatMessage.insertAndGenerateKey {
                 it.sessionId to message.sessionId
-                it.sequence to message.sequence
                 it.content to message.contentToJson()
             }
             message.messageId = mId as Int
@@ -185,6 +180,14 @@ open class ChatMessageController : IChatModelConfig {
                 it.userId to userId
                 it.messageId to mId
                 it.createTime to System.currentTimeMillis()
+            }
+
+            DBChatGroup.update {
+                it.lastMessageId to mId
+
+                where {
+                    it.groupId eq message.sessionId
+                }
             }
         } else {
             // 更新
@@ -222,6 +225,7 @@ open class ChatMessageController : IChatModelConfig {
             it.groupId to sessionId
             it.name to "$createTime【群】"
             it.createTime to createTime
+            it.avatar to "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
         }
 
         data.userIdList.forEach { id ->

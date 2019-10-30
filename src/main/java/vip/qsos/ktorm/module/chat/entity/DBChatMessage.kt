@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.schema.BaseTable
 import me.liuwj.ktorm.schema.int
-import me.liuwj.ktorm.schema.text
 import me.liuwj.ktorm.schema.varchar
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
@@ -50,10 +49,21 @@ data class TableChatMessage(
         val sessionId: Int,
 
         @Column(name = "sequence")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         @ApiModelProperty(name = "sequence", value = "消息顺序", dataType = "Int")
         val sequence: Int,
 
         @Column(name = "content")
         @ApiModelProperty(name = "content", value = "聊天消息内容", dataType = "String")
         val content: String
-)
+) {
+    /**转化为业务实体*/
+    fun toChatMessage(): ChatMessage {
+        return ChatMessage(
+                this.sessionId,
+                this.messageId,
+                this.sequence,
+                ChatMessage.jsonToContent(this.content)
+        )
+    }
+}

@@ -63,7 +63,7 @@ data class TableLoginUser(
 
         @Column(name = "avatar")
         @ApiModelProperty(name = "avatar", value = "头像,http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png")
-        val avatar: String? = null,
+        val avatar: String? = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png",
 
         @Column(name = "birth")
         @ApiModelProperty(name = "birth", value = "出生,1969-05-05")

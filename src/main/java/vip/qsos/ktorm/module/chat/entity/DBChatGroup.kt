@@ -19,15 +19,19 @@ private const val TAB_NAME = "t_chat_group"
 object DBChatGroup : BaseTable<TableChatGroup>(TAB_NAME) {
     val groupId by int("id").primaryKey()
     val name by varchar("name")
+    val avatar by varchar("avatar")
     val createTime by long("create_time")
     val notice by varchar("notice")
+    val lastMessageId by int("last_message_id")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatGroup {
         return TableChatGroup(
                 groupId = row[groupId]!!,
                 name = row[name]!!,
+                avatar = row[avatar]!!,
                 createTime = row[createTime]!!,
-                notice = row[notice]
+                notice = row[notice],
+                lastMessageId = row[lastMessageId]
         )
     }
 }
@@ -49,7 +53,15 @@ data class TableChatGroup(
         @ApiModelProperty(name = "createTime", value = "创建时间")
         val createTime: Long,
 
+        @Column(name = "avatar")
+        @ApiModelProperty(name = "avatar", value = "群封面,http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png")
+        val avatar: String? = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png",
+
         @Column(name = "notice")
-        @ApiModelProperty(name = "notice", value = "群公告", dataType = "String")
-        val notice: String? = null
+        @ApiModelProperty(name = "notice", value = "群公告")
+        val notice: String? = null,
+
+        @Column(name = "last_message_id")
+        @ApiModelProperty(name = "lastMessageId", value = "最后一条消息ID")
+        val lastMessageId: Int? = null
 )

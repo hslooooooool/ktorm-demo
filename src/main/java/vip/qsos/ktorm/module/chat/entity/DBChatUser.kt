@@ -55,8 +55,8 @@ data class TableChatUser(
         val userName: String,
 
         @Column(name = "avatar")
-        @ApiModelProperty(name = "avatar", value = "头像,http://www.avatar.com/avatar/0001.png", dataType = "String")
-        val avatar: String?,
+        @ApiModelProperty(name = "avatar", value = "头像,http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png", dataType = "String")
+        val avatar: String? = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png",
 
         @Column(name = "birth")
         @ApiModelProperty(name = "birth", value = "出生,1969-05-05", dataType = "String")

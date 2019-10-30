@@ -35,17 +35,20 @@ class LoginUserController : ILoginUserModel {
             val userId = DBLoginUser.insertAndGenerateKey {
                 it.account to account
                 it.password to password
+                it.avatar to "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
             } as Int
             val ok = DBChatUser.insert {
                 it.userId to userId
                 it.userName to account
+                it.avatar to "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
             }
             if (ok > 0) {
                 MResult<LoginUser>().result(LoginUser(
                         userId = userId,
                         account = account,
                         password = password,
-                        userName = account
+                        userName = account,
+                        avatar = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
                 ))
             } else {
                 MResult<LoginUser>().error("注册失败")
