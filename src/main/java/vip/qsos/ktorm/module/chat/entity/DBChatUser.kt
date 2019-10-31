@@ -65,4 +65,15 @@ data class TableChatUser(
         @Column(name = "sexuality")
         @ApiModelProperty(name = "sexuality", value = "性别,0女 1男 null未知", dataType = "Int")
         val sexuality: Int?
-)
+) {
+    /**转化为业务实体*/
+    fun toChatUser(): ChatUser {
+        return ChatUser(
+                userId = this.userId,
+                userName = this.userName,
+                avatar = this.avatar,
+                birth = this.birth,
+                sexuality = this.sexuality
+        )
+    }
+}

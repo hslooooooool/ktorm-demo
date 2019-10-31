@@ -60,10 +60,23 @@ open class ChatMessageController : IChatModelConfig {
                     avatar = group.avatar,
                     notice = group.notice
             )
-            chatGroup.lastMessage = group.lastMessageId?.let { messageId ->
+
+            val message = group.lastMessageId?.let { messageId ->
                 DBChatMessage.findOne {
                     it.messageId eq messageId
                 }?.toChatMessage()
+            }
+            message?.let {
+                val chatUserWithMessage = DBChatUserWithMessage.findOne {
+                    it.messageId eq message.messageId
+                }!!
+                val user = DBChatUser.findById(chatUserWithMessage.userId)!!.toChatUser()
+
+                chatGroup.lastMessage = MChatMessage(
+                        user = user,
+                        createTime = chatUserWithMessage.createTime,
+                        message = message
+                )
             }
             chatGroup
         }
