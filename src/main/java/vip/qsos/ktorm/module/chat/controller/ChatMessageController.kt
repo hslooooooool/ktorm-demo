@@ -1,7 +1,9 @@
 package vip.qsos.ktorm.module.chat.controller
 
 import io.swagger.annotations.ApiOperation
-import me.liuwj.ktorm.dsl.*
+import me.liuwj.ktorm.dsl.delete
+import me.liuwj.ktorm.dsl.eq
+import me.liuwj.ktorm.dsl.update
 import me.liuwj.ktorm.entity.*
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.module.chat.entity.*
@@ -12,21 +14,21 @@ import vip.qsos.ktorm.util.MResult
 @RequestMapping("/chat")
 open class ChatMessageController : IChatModelConfig {
 
-    override fun getSessionById(sessionId: Int): MResult<ChatSession> {
+    override fun getSessionById(sessionId: Int): MResult<ChatSessionBo> {
         val session = DBChatSession.findById(sessionId)?.let {
-            ChatSession(sessionId = it.sessionId, type = it.type)
+            ChatSessionBo(sessionId = it.sessionId, type = it.type)
         }
         return if (session == null) {
-            MResult<ChatSession>().error(500, "无法找到")
+            MResult<ChatSessionBo>().error(500, "无法找到")
         } else {
-            MResult<ChatSession>().result(session)
+            MResult<ChatSessionBo>().result(session)
         }
     }
 
-    override fun getAllUser(userId: Int): MResult<List<ChatUser>> {
+    override fun getAllUser(userId: Int): MResult<List<ChatUserBo>> {
         val users = DBChatUser.findAll()
                 .map {
-                    ChatUser(
+                    ChatUserBo(
                             userId = it.userId,
                             userName = it.userName,
                             avatar = it.avatar,
@@ -34,11 +36,11 @@ open class ChatMessageController : IChatModelConfig {
                             sexuality = it.sexuality
                     )
                 }
-        return MResult<List<ChatUser>>().result(users)
+        return MResult<List<ChatUserBo>>().result(users)
     }
 
     override fun getMessageById(messageId: Int): MResult<ChatMessage> {
-        val message = DBChatMessage.findById(messageId)?.toChatMessage()
+        val message = ChatMessage.getVo(DBChatMessage.findById(messageId))
         return if (message == null) {
             MResult<ChatMessage>().error(500, "无法找到")
         } else {
@@ -46,135 +48,124 @@ open class ChatMessageController : IChatModelConfig {
         }
     }
 
-    override fun getGroupWithMe(userId: Int): MResult<List<ChatGroup>> {
+    override fun getGroupWithMe(userId: Int): MResult<List<ChatGroupBo>> {
         val groupIds = DBChatUserWithSession.findList {
             it.userId eq userId
         }.map {
             it.sessionId
         }.toSet()
         val groupList = DBChatGroup.findListByIds(groupIds).map { group ->
-            val chatGroup = ChatGroup(
-                    groupId = group.groupId,
-                    name = group.name,
-                    createTime = group.createTime,
-                    avatar = group.avatar,
-                    notice = group.notice
-            )
+            val chatGroup = ChatGroupBo.getVo(group)
 
             val message = group.lastMessageId?.let { messageId ->
-                DBChatMessage.findOne {
+                ChatMessage.getVo(DBChatMessage.findOne {
                     it.messageId eq messageId
-                }?.toChatMessage()
+                })
             }
             message?.let {
                 val chatUserWithMessage = DBChatUserWithMessage.findOne {
                     it.messageId eq message.messageId
                 }!!
-                val user = DBChatUser.findById(chatUserWithMessage.userId)!!.toChatUser()
+                val user = ChatUserBo.getBo(DBChatUser.findById(chatUserWithMessage.userId)!!)
 
-                chatGroup.lastMessage = MChatMessage(
+                chatGroup.lastMessage = ChatMessageBo(
                         user = user,
-                        createTime = chatUserWithMessage.createTime,
+                        createTime = chatUserWithMessage.gmtCreate,
                         message = message
                 )
             }
             chatGroup
         }
-        return MResult<List<ChatGroup>>().result(groupList)
+        return MResult<List<ChatGroupBo>>().result(groupList)
     }
 
-    override fun getUserById(userId: Int): MResult<ChatUser> {
-        var user: ChatUser? = null
+    override fun getUserById(userId: Int): MResult<ChatUserBo> {
+        var user: ChatUserBo? = null
         DBChatUser.findById(userId)?.let {
-            user = ChatUser(
+            user = ChatUserBo(
                     userId = it.userId, userName = it.userName, avatar = it.avatar,
                     birth = it.birth, sexuality = it.sexuality
             )
         }
         return if (user == null) {
-            MResult<ChatUser>().error(500, "无法找到")
+            MResult<ChatUserBo>().error(500, "无法找到")
         } else {
-            MResult<ChatUser>().result(user!!)
+            MResult<ChatUserBo>().result(user!!)
         }
     }
 
     @GetMapping("/group")
     @ApiOperation(value = "获取群信息")
-    override fun getGroupById(groupId: Int): MResult<ChatGroup> {
+    override fun getGroupById(groupId: Int): MResult<ChatGroupBo> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @GetMapping("/group/getGroupByBySessionId")
     @ApiOperation(value = "获取会话对应的群信息")
-    override fun getGroupByBySessionId(sessionId: Int): MResult<ChatGroup> {
+    override fun getGroupByBySessionId(sessionId: Int): MResult<ChatGroupBo> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUser>> {
+    override fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUserBo>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getMessageListBySessionId(sessionId: Int): MResult<List<MChatMessage>> {
-        val list: ArrayList<MChatMessage> = arrayListOf()
+    override fun getMessageListBySessionId(sessionId: Int): MResult<List<ChatMessageBo>> {
+        val list: ArrayList<ChatMessageBo> = arrayListOf()
         DBChatMessage.findList {
             it.sessionId eq sessionId
         }.map { msg ->
             DBChatUserWithMessage.findOne {
                 it.messageId eq msg.messageId
             }?.let { v ->
-                val createTime = v.createTime
-                val message = msg.toChatMessage()
+                val createTime = v.gmtCreate
+                val message = ChatMessage.getVo(msg)!!
                 DBChatUser.findOne {
                     it.userId eq v.userId
                 }?.let {
-                    ChatUser(
+                    ChatUserBo(
                             userId = it.userId, userName = it.userName, avatar = it.avatar,
                             birth = it.birth, sexuality = it.sexuality
                     )
                 }?.let { user ->
-                    list.add(MChatMessage(user = user, message = message, createTime = createTime))
+                    list.add(ChatMessageBo(user = user, message = message, createTime = createTime))
                 }
             }
         }
         list.sortByDescending {
             it.message.sequence
         }
-        return MResult<List<MChatMessage>>().result(list)
+        return MResult<List<ChatMessageBo>>().result(list)
     }
 
-    override fun getMessageListByUserId(userId: Int): MResult<List<MChatMessage>> {
+    override fun getMessageListByUserId(userId: Int): MResult<List<ChatMessageBo>> {
         val list = DBChatUserWithMessage.findList {
             it.userId eq userId
         }
-        val messages: ArrayList<MChatMessage> = arrayListOf()
+        val messages: ArrayList<ChatMessageBo> = arrayListOf()
         list.forEach {
-            val createTime = it.createTime
+            val createTime = it.gmtCreate
             val user = DBChatUser.findById(it.userId)!!.let { user ->
-                ChatUser(userId = user.userId, userName = user.userName, avatar = user.avatar, birth = user.birth,
+                ChatUserBo(userId = user.userId, userName = user.userName, avatar = user.avatar, birth = user.birth,
                         sexuality = user.sexuality)
             }
-            val message = DBChatMessage.findById(it.messageId)!!.toChatMessage()
-            messages.add(MChatMessage(user = user, message = message, createTime = createTime))
+            val message = ChatMessage.getVo(DBChatMessage.findById(it.messageId))!!
+            messages.add(ChatMessageBo(user = user, message = message, createTime = createTime))
         }
         messages.sortByDescending {
             it.message.sequence
         }
-        return MResult<List<MChatMessage>>().result(messages)
+        return MResult<List<ChatMessageBo>>().result(messages)
     }
 
-    override fun getSessionListByUserId(userId: Int): MResult<List<ChatSession>> {
+    override fun getSessionListByUserId(userId: Int): MResult<List<ChatSessionBo>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun createUser(user: ChatUser): MResult<ChatUser> {
-        val id = DBChatUser.insertAndGenerateKey {
-            it.userName to user.userName
-            it.avatar to user.avatar
-            it.birth to user.birth
-            it.sexuality to user.sexuality
-        }
+    override fun createUser(user: ChatUserBo): MResult<ChatUserBo> {
+        val id = DBChatUser.add(user.toTable())
         user.userId = id as Int
-        return MResult<ChatUser>().result(user)
+        return MResult<ChatUserBo>().result(user)
     }
 
     override fun sendMessage(userId: Int, message: ChatMessage): MResult<ChatMessage> {
@@ -183,17 +174,13 @@ open class ChatMessageController : IChatModelConfig {
         }
         if (message.messageId < 0) {
             // 插入
-            val mId = DBChatMessage.insertAndGenerateKey {
-                it.sessionId to message.sessionId
-                it.content to message.contentToJson()
-            }
+            val mId = DBChatMessage.add(message.toTable())
             message.messageId = mId as Int
 
-            DBChatUserWithMessage.insert {
-                it.userId to userId
-                it.messageId to mId
-                it.createTime to System.currentTimeMillis()
-            }
+            DBChatUserWithMessage.add(TableChatUserWithMessage(
+                    userId = userId,
+                    messageId = mId
+            ))
 
             DBChatGroup.update {
                 it.lastMessageId to mId
@@ -215,52 +202,48 @@ open class ChatMessageController : IChatModelConfig {
         return MResult<ChatMessage>().result(message)
     }
 
-    override fun createSession(userId: Int, data: IChatModel.Post.FormCreateSession): MResult<ChatSession> {
+    override fun createSession(userId: Int, data: IChatModel.Post.FormCreateSession): MResult<ChatSessionBo> {
 
         val oldSession = hasSession(data.userIdList)
         if (oldSession.sessionId != -1) {
             // 存在已有群，直接获取
-            return MResult<ChatSession>().result(oldSession)
+            return MResult<ChatSessionBo>().result(oldSession)
         }
 
         val createTime = System.currentTimeMillis()
 
-        val session = ChatSession(
-                type = if (data.userIdList.size > 2) ChatType.GROUP else ChatType.SINGLE
+        val session = ChatSessionBo(
+                type = if (data.userIdList.size > 2) ChatType.GROUP else ChatType.SINGLE,
+                hashCode = oldSession.hashCode
         )
-        val sessionId = DBChatSession.insertAndGenerateKey {
-            it.type to session.type.ordinal
-            it.hashCode to oldSession.hashCode
-        } as Int
+        val sessionId = DBChatSession.add(session.toTable()) as Int
         session.sessionId = sessionId
+        DBChatGroup.add(TableChatGroup(
+                groupId = sessionId,
+                name = "$createTime【群】",
+                notice = "",
+                avatar = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
+        ))
 
-        DBChatGroup.insert {
-            it.groupId to sessionId
-            it.name to "$createTime【群】"
-            it.createTime to createTime
-            it.avatar to "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
-        }
-
-        data.userIdList.forEach { id ->
-            DBChatUserWithSession.insert {
-                it.sessionId to sessionId
-                it.userId to id
-                it.createTime to createTime
-            }
+        data.userIdList.forEach { uId ->
+            DBChatUserWithSession.add(TableChatUserWithSession(
+                    userId = uId,
+                    sessionId = sessionId
+            ))
         }
         data.message?.let {
             it.sessionId = sessionId
             val result = sendMessage(userId, it)
             return if (result.code == 200) {
-                MResult<ChatSession>().result(session)
+                MResult<ChatSessionBo>().result(session)
             } else {
-                MResult<ChatSession>().error(result.code, result.msg)
+                MResult<ChatSessionBo>().error(result.code, result.msg)
             }
         }
-        return MResult<ChatSession>().result(session)
+        return MResult<ChatSessionBo>().result(session)
     }
 
-    override fun hasSession(userIdList: List<Int>): ChatSession {
+    override fun hasSession(userIdList: List<Int>): ChatSessionBo {
         var hashCode = ""
         userIdList.sorted().forEach {
             hashCode += it.toString()
@@ -269,33 +252,32 @@ open class ChatMessageController : IChatModelConfig {
         return DBChatSession.findOne {
             it.hashCode eq hashCode
         }?.let {
-            ChatSession(sessionId = it.sessionId, type = it.type, hashCode = it.hashCode)
-        } ?: ChatSession(sessionId = -1, type = ChatType.SINGLE, hashCode = hashCode)
+            ChatSessionBo(sessionId = it.sessionId, type = it.type, hashCode = it.hashCode)
+        } ?: ChatSessionBo(sessionId = -1, type = ChatType.SINGLE, hashCode = hashCode)
     }
 
-    override fun addUserListToSession(userId: Int, userIdList: List<Int>, sessionId: Int): MResult<ChatSession> {
+    override fun addUserListToSession(userId: Int, userIdList: List<Int>, sessionId: Int): MResult<ChatSessionBo> {
         val session = DBChatSession.findById(sessionId)?.let {
-            ChatSession(sessionId = it.sessionId, type = it.type)
-        } ?: return MResult<ChatSession>().error(500, "会话不存在")
-        userIdList.forEach { id ->
-            DBChatUserWithSession.insert {
-                it.sessionId to session.sessionId
-                it.userId to id
-                it.createTime to System.currentTimeMillis()
-            }
+            ChatSessionBo(sessionId = it.sessionId, type = it.type)
+        } ?: return MResult<ChatSessionBo>().error(500, "会话不存在")
+        userIdList.forEach { uId ->
+            DBChatUserWithSession.add(TableChatUserWithSession(
+                    userId = uId,
+                    sessionId = sessionId
+            ))
         }
-        return MResult<ChatSession>().result(session)
+        return MResult<ChatSessionBo>().result(session)
     }
 
     @PutMapping("/group/updateGroupNotice")
     @ApiOperation(value = "更新群公告")
-    override fun updateGroupNotice(notice: String): MResult<ChatGroup> {
+    override fun updateGroupNotice(notice: String): MResult<ChatGroupBo> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @PutMapping("/group/updateGroupName")
     @ApiOperation(value = "更新群名称")
-    override fun updateGroupName(name: String): MResult<ChatGroup> {
+    override fun updateGroupName(name: String): MResult<ChatGroupBo> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

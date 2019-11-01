@@ -39,7 +39,8 @@ spring:
     # 配置是否将执行的 SQL 输出到日志
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 app:
   # APP模块，是通过jwt认证的，如果要使用APP模块，则需要修改【加密秘钥】
@@ -49,3 +50,9 @@ app:
     # token 有效时长，7 天，单位秒
     expire: 604800
     header: token
+
+# 上传文件保存路径
+stream:
+  http:
+    multipart:
+      location: D:\file-server

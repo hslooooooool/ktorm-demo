@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam
  * @param fields 内容map集合
  */
 @ApiModel(description = "聊天消息内容")
-data class ChatContent(
+data class ChatContentBo(
         @RequestParam
         @ApiModelProperty(value = "聊天消息内容Map", required = true, example = "{'contentType':1,'content':'文本消息内容'}")
         var fields: Map<String, Any?>? = null

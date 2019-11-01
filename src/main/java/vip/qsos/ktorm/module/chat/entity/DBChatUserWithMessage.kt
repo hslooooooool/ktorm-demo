@@ -3,9 +3,10 @@ package vip.qsos.ktorm.module.chat.entity
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
-import me.liuwj.ktorm.schema.BaseTable
 import me.liuwj.ktorm.schema.int
-import me.liuwj.ktorm.schema.long
+import vip.qsos.ktorm.module.AbsTable
+import vip.qsos.ktorm.module.MBaseTable
+import java.time.LocalDate
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -17,17 +18,20 @@ private const val TAB_NAME = "t_chat_user_with_message"
  * @author : 华清松
  * @description : 聊天用户表
  */
-object DBChatUserWithMessage : BaseTable<TableChatUserWithMessage>(TAB_NAME) {
+object DBChatUserWithMessage : MBaseTable<TableChatUserWithMessage>(TAB_NAME) {
     val id by int("id").primaryKey()
     val userId by int("user_id")
     val messageId by int("message_id")
-    val createTime by long("create_time")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatUserWithMessage {
         return TableChatUserWithMessage(
+                id = row[id]!!,
                 userId = row[userId]!!,
                 messageId = row[messageId]!!,
-                createTime = row[createTime]!!
+
+                gmtCreate = row[gmtCreate]!!,
+                gmtUpdate = row[gmtUpdate]!!,
+                deleted = row[deleted]!!
         )
     }
 }
@@ -35,23 +39,37 @@ object DBChatUserWithMessage : BaseTable<TableChatUserWithMessage>(TAB_NAME) {
 @javax.persistence.Entity
 @javax.persistence.Table(name = TAB_NAME)
 @ApiModel(value = "聊天用户与消息关系实体")
-data class TableChatUserWithMessage(
-        @Column(name = "user_id")
-        @ApiModelProperty(name = "userId", value = "用户ID", dataType = "Int")
-        val userId: Int,
-
-        @Column(name = "message_id")
-        @ApiModelProperty(name = "messageId", value = "消息ID", dataType = "Int")
-        val messageId: Int,
-
-        @Column(name = "create_time")
-        @ApiModelProperty(name = "createTime", value = "消息创建时间,毫秒数", dataType = "Long")
-        val createTime: Long
-
-) {
+class TableChatUserWithMessage : AbsTable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(name = "id", value = "用户与消息关系ID", dataType = "Int")
-    var id: Int? = null
+    var id: Int = -1
+
+    @Column(name = "user_id")
+    @ApiModelProperty(name = "userId", value = "用户ID", dataType = "Int")
+    var userId: Int = -1
+
+    @Column(name = "message_id")
+    @ApiModelProperty(name = "messageId", value = "消息ID", dataType = "Int")
+    var messageId: Int = -1
+
+    constructor()
+    constructor(
+            id: Int = -1,
+            userId: Int,
+            messageId: Int,
+
+            gmtCreate: LocalDate = LocalDate.now(),
+            gmtUpdate: LocalDate = LocalDate.now(),
+            deleted: Boolean = false
+    ) {
+        this.id = id
+        this.userId = userId
+        this.messageId = messageId
+
+        this.gmtCreate = gmtCreate
+        this.gmtUpdate = gmtUpdate
+        this.deleted = deleted
+    }
 }

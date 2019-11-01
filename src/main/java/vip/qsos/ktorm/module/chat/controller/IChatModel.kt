@@ -21,7 +21,7 @@ interface IChatModel {
          * */
         @GetMapping("/session/getSessionById")
         @ApiOperation(value = "获取会话信息")
-        fun getSessionById(sessionId: Int): MResult<ChatSession>
+        fun getSessionById(sessionId: Int): MResult<ChatSessionBo>
 
         /**获取消息数据
          * @param messageId 消息ID
@@ -37,20 +37,20 @@ interface IChatModel {
          * */
         @GetMapping("/user/getUserById")
         @ApiOperation(value = "获取用户信息")
-        fun getUserById(@RequestHeader userId: Int): MResult<ChatUser>
+        fun getUserById(@RequestHeader userId: Int): MResult<ChatUserBo>
 
         /**获取聊天群数据
          * @param groupId 聊天群ID
          * @return 聊天群数据
          * */
-        fun getGroupById(groupId: Int): MResult<ChatGroup>
+        fun getGroupById(groupId: Int): MResult<ChatGroupBo>
 
         /**获取所有用户
          * @return 所有用户
          * */
         @GetMapping("/user/getAllUser")
         @ApiOperation(value = "获取所有用户")
-        fun getAllUser(@RequestHeader userId: Int): MResult<List<ChatUser>>
+        fun getAllUser(@RequestHeader userId: Int): MResult<List<ChatUserBo>>
 
     }
 
@@ -60,7 +60,7 @@ interface IChatModel {
          * @param sessionId 会话ID
          * @return 聊天群数据
          * */
-        fun getGroupByBySessionId(sessionId: Int): MResult<ChatGroup>
+        fun getGroupByBySessionId(sessionId: Int): MResult<ChatGroupBo>
 
         /**获取会话下的用户列表
          * @param sessionId 会话ID
@@ -68,11 +68,11 @@ interface IChatModel {
          * */
         @GetMapping("/user/getUserListBySessionId")
         @ApiOperation(value = "获取会话下的用户列表")
-        fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUser>>
+        fun getUserListBySessionId(sessionId: Int): MResult<List<ChatUserBo>>
 
         @GetMapping("/group/getGroupWithMe")
         @ApiOperation(value = "获取用户所在的所有群列表")
-        fun getGroupWithMe(@RequestHeader userId: Int): MResult<List<ChatGroup>>
+        fun getGroupWithMe(@RequestHeader userId: Int): MResult<List<ChatGroupBo>>
 
         /**获取会话下的消息列表
          * @param sessionId 会话ID
@@ -80,7 +80,7 @@ interface IChatModel {
          * */
         @GetMapping("/message/getMessageListBySessionId")
         @ApiOperation(value = "获取会话下的消息列表")
-        fun getMessageListBySessionId(sessionId: Int): MResult<List<MChatMessage>>
+        fun getMessageListBySessionId(sessionId: Int): MResult<List<ChatMessageBo>>
 
         /**获取用户发送的消息
          * @param userId 用户ID
@@ -88,7 +88,7 @@ interface IChatModel {
          * */
         @GetMapping("/message/getMessageListByUserId")
         @ApiOperation(value = "获取用户发送的消息")
-        fun getMessageListByUserId(@RequestHeader userId: Int): MResult<List<MChatMessage>>
+        fun getMessageListByUserId(@RequestHeader userId: Int): MResult<List<ChatMessageBo>>
 
         /**获取用户订阅的会话
          * @param userId 用户ID
@@ -96,7 +96,7 @@ interface IChatModel {
          * */
         @GetMapping("/session/getSessionListByUserId")
         @ApiOperation(value = "获取用户订阅的会话")
-        fun getSessionListByUserId(@RequestHeader userId: Int): MResult<List<ChatSession>>
+        fun getSessionListByUserId(@RequestHeader userId: Int): MResult<List<ChatSessionBo>>
 
     }
 
@@ -108,7 +108,7 @@ interface IChatModel {
          * */
         @PostMapping("/user/createUser")
         @ApiOperation(value = "创建用户")
-        fun createUser(@RequestBody user: ChatUser): MResult<ChatUser>
+        fun createUser(@RequestBody user: ChatUserBo): MResult<ChatUserBo>
 
         /**发送消息
          * @param message 消息数据
@@ -131,12 +131,12 @@ interface IChatModel {
         fun createSession(
                 @RequestHeader userId: Int,
                 @RequestBody data: FormCreateSession
-        ): MResult<ChatSession>
+        ): MResult<ChatSessionBo>
 
         /**TODO【算法】校验会话是否已存在，判断条件：userIdList 范围内的用户拥有同一个 session 会话*/
         fun hasSession(
                 userIdList: List<Int>
-        ): ChatSession
+        ): ChatSessionBo
 
         /**创建会话表单数据
          * @param userIdList 用户ID集合
@@ -161,19 +161,19 @@ interface IChatModel {
                 @RequestHeader userId: Int,
                 @RequestParam userIdList: List<Int>,
                 sessionId: Int
-        ): MResult<ChatSession>
+        ): MResult<ChatSessionBo>
 
         /**更新聊天群公告
          * @param notice 需更新的聊天群公告
          * @return 已更新的聊天群数据
          * */
-        fun updateGroupNotice(notice: String): MResult<ChatGroup>
+        fun updateGroupNotice(notice: String): MResult<ChatGroupBo>
 
         /**更新聊天群名称
          * @param name 需更新的聊天群名称
          * @return 已更新的聊天群数据
          * */
-        fun updateGroupName(name: String): MResult<ChatGroup>
+        fun updateGroupName(name: String): MResult<ChatGroupBo>
 
     }
 

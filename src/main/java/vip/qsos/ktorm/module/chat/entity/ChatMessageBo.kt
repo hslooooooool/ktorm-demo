@@ -3,6 +3,8 @@ package vip.qsos.ktorm.module.chat.entity
 import com.google.gson.Gson
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import vip.qsos.ktorm.module.IVo
+import java.time.LocalDate
 
 /**
  * @author : 华清松
@@ -14,7 +16,7 @@ import io.swagger.annotations.ApiModelProperty
  */
 @ApiModel(description = "聊天消息")
 data class ChatMessage(
-        /**@see ChatSession.sessionId*/
+        /**@see ChatSessionBo.sessionId*/
         @ApiModelProperty(value = "会话ID", required = false)
         var sessionId: Int = -1,
         @ApiModelProperty(value = "消息ID", required = false)
@@ -22,22 +24,42 @@ data class ChatMessage(
         @ApiModelProperty(value = "消息序列", required = true)
         var sequence: Int = -1,
         @ApiModelProperty(value = "消息内容", required = true)
-        var content: ChatContent
-) {
+        var content: ChatContentBo
+) : IVo<TableChatMessage> {
+
+    override fun toTable(): TableChatMessage {
+        return TableChatMessage(
+                messageId,
+                sessionId,
+                sequence,
+                contentToJson()
+        )
+    }
 
     fun contentToJson(): String {
         return Gson().toJson(content)
     }
 
     companion object {
-        fun jsonToContent(json: String): ChatContent {
-            return Gson().fromJson(json, ChatContent::class.java)
+        fun jsonToContent(json: String): ChatContentBo {
+            return Gson().fromJson(json, ChatContentBo::class.java)
+        }
+
+        fun getVo(table: TableChatMessage?): ChatMessage? {
+            return table?.let {
+                ChatMessage(
+                        it.sessionId,
+                        it.messageId,
+                        it.sequence,
+                        Gson().fromJson(it.content, ChatContentBo::class.java)
+                )
+            }
         }
     }
 }
 
-data class MChatMessage(
-        val user: ChatUser,
-        val createTime: Long,
+data class ChatMessageBo(
+        val user: ChatUserBo,
+        val createTime: LocalDate,
         val message: ChatMessage
 )

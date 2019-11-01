@@ -3,7 +3,7 @@ package vip.qsos.ktorm.exception
 /**
  * @author : 华清松
  * @date : 2019-05-17
- * @description : 全局异常捕获
+ * @description : 全局异常
  */
 class BaseException : RuntimeException {
 

@@ -34,7 +34,7 @@
         <commons.configuration.version>1.10</commons.configuration.version>
         <swagger.version>2.7.0</swagger.version>
         <swaggerui.version>1.9.0</swaggerui.version>
-
+        <thumbnailator.version>0.4.8</thumbnailator.version>
         <!-- docker 配置-->
         <docker.repository>registry.cn-shenzhen.aliyuncs.com</docker.repository>
         <docker.registry.name>ktorm-demo</docker.registry.name>
@@ -116,7 +116,14 @@
             <artifactId>commons-configuration</artifactId>
             <version>${commons.configuration.version}</version>
         </dependency>
-
+    
+        <!--图片压缩包-->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>${thumbnailator.version}</version>
+        </dependency>
+        
         <!-- Gson-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
