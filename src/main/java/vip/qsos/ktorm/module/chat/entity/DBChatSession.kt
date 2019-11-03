@@ -21,7 +21,6 @@ private const val TAB_NAME = "t_chat_session"
  */
 object DBChatSession : MBaseTable<TableChatSession>(TAB_NAME) {
     val sessionId by int("id").primaryKey()
-
     val type by int("chat_type")
     val hashCode by varchar("hash_code")
 

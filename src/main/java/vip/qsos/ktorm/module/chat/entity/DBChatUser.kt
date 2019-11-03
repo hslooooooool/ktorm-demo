@@ -48,23 +48,18 @@ class TableChatUser : AbsTable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(name = "userId", value = "用户ID")
     var userId: Int = -1
 
     @Column(name = "name", nullable = false)
-    @ApiModelProperty(name = "userName", value = "用户姓名")
     var userName: String = ""
 
     @Column(name = "avatar")
-    @ApiModelProperty(name = "avatar", value = "头像,http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png", dataType = "String")
     var avatar: String? = null
 
     @Column(name = "birth")
-    @ApiModelProperty(name = "birth", value = "出生,1969-05-05")
     var birth: String? = ""
 
     @Column(name = "sexuality", nullable = false)
-    @ApiModelProperty(name = "sexuality", value = "性别,0女 1男 -1未知")
     var sexuality: Int? = -1
 
     constructor()

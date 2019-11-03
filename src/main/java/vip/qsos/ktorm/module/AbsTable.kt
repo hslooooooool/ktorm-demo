@@ -1,10 +1,11 @@
 package vip.qsos.ktorm.module
 
-import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.BaseTable
 import me.liuwj.ktorm.schema.boolean
 import me.liuwj.ktorm.schema.date
+import org.hibernate.annotations.DynamicInsert
+import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDate
 import javax.persistence.Column
 import javax.persistence.MappedSuperclass
@@ -13,18 +14,17 @@ import javax.persistence.MappedSuperclass
  * @author : 华清松
  * @description : 数据库表通用字段
  */
+@DynamicInsert
+@DynamicUpdate
 @MappedSuperclass
 abstract class AbsTable(
         @Column(name = "gmt_create", nullable = false)
-        @ApiModelProperty(name = "gmtCreate", value = "创建时间")
         var gmtCreate: LocalDate = LocalDate.now(),
 
         @Column(name = "gmt_update", nullable = false)
-        @ApiModelProperty(name = "gmtUpdate", value = "更新时间")
         var gmtUpdate: LocalDate = LocalDate.now(),
 
         @Column(name = "deleted", nullable = false)
-        @ApiModelProperty(name = "deleted", value = "逻辑删除")
         var deleted: Boolean = false
 )
 

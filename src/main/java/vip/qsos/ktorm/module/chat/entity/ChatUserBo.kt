@@ -1,5 +1,6 @@
 package vip.qsos.ktorm.module.chat.entity
 
+import io.swagger.annotations.ApiModel
 import vip.qsos.ktorm.module.IVo
 
 /**
@@ -11,6 +12,7 @@ import vip.qsos.ktorm.module.IVo
  * @param birth 用户出生日期
  * @param sexuality 用户性别
  */
+@ApiModel("聊天用户")
 data class ChatUserBo(
         var userId: Int = -1,
         var userName: String,
