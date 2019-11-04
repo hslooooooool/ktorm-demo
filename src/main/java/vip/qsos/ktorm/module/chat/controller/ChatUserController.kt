@@ -8,8 +8,7 @@ import vip.qsos.ktorm.module.chat.service.IChatService
 import vip.qsos.ktorm.util.MResult
 
 @RestController
-open class ChatUserController(
-        @Autowired
+open class ChatUserController @Autowired constructor(
         private val mChatUserService: IChatService.IUser
 ) : IChatController.IUser {
 

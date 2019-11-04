@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import javax.sql.DataSource
 
 /**
@@ -17,7 +18,7 @@ import javax.sql.DataSource
  * @description : Ktorm 数据库配置
  */
 @Configuration
-open class KtormConfiguration {
+open class KtormConfiguration : WebMvcConfigurer {
 
     @Autowired
     lateinit var dataSource: DataSource

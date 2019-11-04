@@ -22,9 +22,8 @@ class ChatSessionService(
 ) : IChatService.ISession {
 
     override fun getSessionById(sessionId: Int): ChatSessionBo {
-        return DBChatSession.findById(sessionId)?.let {
-            ChatSessionBo(sessionId = it.sessionId, type = it.type)
-        } ?: throw BaseException("无法找到")
+        return ChatSessionBo().getBo(DBChatSession.findById(sessionId)) as ChatSessionBo?
+                ?: throw BaseException("无法找到")
     }
 
     override fun getSessionListByUserId(userId: Int): List<ChatSessionBo> {
@@ -41,7 +40,7 @@ class ChatSessionService(
         val createTime = System.currentTimeMillis()
 
         val session = ChatSessionBo(
-                type = if (data.userIdList.size > 2) ChatType.GROUP else ChatType.SINGLE,
+                type = if (data.userIdList.size > 2) ChatSessionType.GROUP else ChatSessionType.SINGLE,
                 hashCode = oldSession.hashCode
         )
         val sessionId = DBChatSession.add(session.toTable()) as Int
@@ -77,13 +76,12 @@ class ChatSessionService(
             it.hashCode eq hashCode
         }?.let {
             ChatSessionBo(sessionId = it.sessionId, type = it.type, hashCode = it.hashCode)
-        } ?: ChatSessionBo(sessionId = -1, type = ChatType.SINGLE, hashCode = hashCode)
+        } ?: ChatSessionBo(sessionId = -1, type = ChatSessionType.SINGLE, hashCode = hashCode)
     }
 
     override fun addUserListToSession(userId: Int, userIdList: List<Int>, sessionId: Int): ChatSessionBo {
-        val session = DBChatSession.findById(sessionId)?.let {
-            ChatSessionBo(sessionId = it.sessionId, type = it.type)
-        } ?: throw BaseException("会话不存在")
+        val session = ChatSessionBo().getBo(DBChatSession.findById(sessionId)) as ChatSessionBo?
+                ?: throw BaseException("无法找到")
         userIdList.forEach { uId ->
             DBChatUserWithSession.add(TableChatUserWithSession(
                     userId = uId,

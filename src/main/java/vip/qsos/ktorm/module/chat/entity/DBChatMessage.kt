@@ -8,7 +8,7 @@ import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -33,7 +33,6 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
                 sessionId = row[sessionId] ?: -1,
                 sequence = row[sequence] ?: -1,
                 content = row[content] ?: "",
-
                 gmtCreate = row[gmtCreate]!!,
                 gmtUpdate = row[gmtUpdate]!!,
                 deleted = row[deleted]!!
@@ -81,8 +80,8 @@ class TableChatMessage : AbsTable {
             sequence: Int,
             content: String,
 
-            gmtCreate: LocalDate = LocalDate.now(),
-            gmtUpdate: LocalDate = LocalDate.now(),
+            gmtCreate: LocalDateTime = LocalDateTime.now(),
+            gmtUpdate: LocalDateTime = LocalDateTime.now(),
             deleted: Boolean = false
     ) {
         this.messageId = messageId

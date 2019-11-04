@@ -1,6 +1,9 @@
 package vip.qsos.ktorm.module.chat.controller
 
-import io.swagger.annotations.*
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.ApiSort
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.module.chat.entity.form.FormCreateSession
@@ -124,8 +127,8 @@ interface IChatController {
                 @RequestHeader
                 @ApiParam(value = "登录用户ID", required = true)
                 userId: Int,
-                @RequestBody message: ChatMessage
-        ): MResult<ChatMessage>
+                @RequestBody message: ChatMessageBo
+        ): MResult<ChatMessageBo>
 
         @GetMapping("/getMessageById")
         @ApiOperation(value = "获取消息数据")
@@ -133,7 +136,7 @@ interface IChatController {
                 @RequestParam
                 @ApiParam(value = "消息ID", required = true)
                 messageId: Int
-        ): MResult<ChatMessage>
+        ): MResult<ChatMessageBo>
 
         @GetMapping("/getMessageListBySessionId")
         @ApiOperation(value = "获取会话下的消息列表")
@@ -141,7 +144,7 @@ interface IChatController {
                 @RequestParam
                 @ApiParam(value = "会话ID", required = true)
                 sessionId: Int
-        ): MResult<List<ChatMessageBo>>
+        ): MResult<List<ChatMessageInfoBo>>
 
         @GetMapping("/getMessageListByUserId")
         @ApiOperation(value = "获取用户发送的消息")
@@ -149,7 +152,7 @@ interface IChatController {
                 @RequestHeader
                 @ApiParam(value = "登录用户ID", required = true)
                 userId: Int
-        ): MResult<List<ChatMessageBo>>
+        ): MResult<List<ChatMessageInfoBo>>
 
         @DeleteMapping
         @ApiOperation(value = "删除(撤销)消息")
@@ -168,7 +171,6 @@ interface IChatController {
 
         @GetMapping
         @ApiOperation(value = "获取群信息")
-        @ApiImplicitParam(name = "groupId", value = "群ID", required = true)
         fun getGroupById(
                 @RequestParam
                 @ApiParam(value = "群ID", required = true)
@@ -185,7 +187,6 @@ interface IChatController {
 
         @GetMapping("/getGroupByBySessionId")
         @ApiOperation(value = "获取会话对应的群信息")
-        @ApiImplicitParam(name = "sessionId", value = "会话ID", required = true)
         fun getGroupByBySessionId(
                 @RequestParam
                 @ApiParam(value = "会话ID", required = true)

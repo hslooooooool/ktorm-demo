@@ -12,5 +12,5 @@ data class FormCreateUser(
         @ApiModelProperty(name = "birth", value = "出生,1969-05-05")
         var birth: String? = null,
         @ApiModelProperty(name = "sexuality", value = "性别,0女 1男 -1未知")
-        var sexuality: Int? = -1
+        var sexuality: Int = -1
 )

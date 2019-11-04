@@ -7,7 +7,7 @@ import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.int
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -71,8 +71,8 @@ class TableChatUserWithMessage : AbsTable {
             userId: Int,
             messageId: Int,
 
-            gmtCreate: LocalDate = LocalDate.now(),
-            gmtUpdate: LocalDate = LocalDate.now(),
+            gmtCreate: LocalDateTime = LocalDateTime.now(),
+            gmtUpdate: LocalDateTime = LocalDateTime.now(),
             deleted: Boolean = false
     ) {
         this.id = id

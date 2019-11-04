@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "stream.http.multipart.filePath",
+      "type": "java.lang.String",
+      "description": "文件保存路径."
+    }
+  ]
+}

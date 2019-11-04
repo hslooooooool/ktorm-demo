@@ -50,9 +50,3 @@ app:
     # token 有效时长，7 天，单位秒
     expire: 604800
     header: token
-
-# 上传文件保存路径
-stream:
-  http:
-    multipart:
-      location: D:\file-server

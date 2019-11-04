@@ -85,25 +85,25 @@ interface IChatService {
          * @param message 消息数据
          * @return 消息数据
          * */
-        fun sendMessage(userId: Int, message: ChatMessage): ChatMessage
+        fun sendMessage(userId: Int, message: ChatMessageBo): ChatMessageBo
 
         /**获取消息数据
          * @param messageId 消息ID
          * @return 消息数据
          * */
-        fun getMessageById(messageId: Int): ChatMessage
+        fun getMessageById(messageId: Int): ChatMessageBo
 
         /**获取会话下的消息列表
          * @param sessionId 会话ID
          * @return 会话下的消息列表
          * */
-        fun getMessageListBySessionId(sessionId: Int): List<ChatMessageBo>
+        fun getMessageListBySessionId(sessionId: Int): List<ChatMessageInfoBo>
 
         /**获取用户发送的消息
          * @param userId 用户ID
          * @return 用户发送的消息
          * */
-        fun getMessageListByUserId(userId: Int): List<ChatMessageBo>
+        fun getMessageListByUserId(userId: Int): List<ChatMessageInfoBo>
 
         /**撤回消息
          * @param messageId 消息ID
@@ -112,6 +112,7 @@ interface IChatService {
 
     }
 
+    /**聊天消息群服务实现*/
     interface IGroup {
         /**获取聊天群数据
          * @param groupId 聊天群ID

@@ -1,11 +1,13 @@
-package vip.qsos.ktorm.module.file.entity
+package vip.qsos.ktorm.module.file.service.impl
 
 import net.coobird.thumbnailator.Thumbnails
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import vip.qsos.ktorm.config.CoreProperties
 import vip.qsos.ktorm.exception.BaseException
-import vip.qsos.ktorm.module.file.service.IFileProcessService
+import vip.qsos.ktorm.module.file.entity.FileResourceBo
+import vip.qsos.ktorm.module.file.service.IFileIOService
 import vip.qsos.ktorm.util.DateUtils
 import java.io.*
 import java.util.*
@@ -16,9 +18,10 @@ import javax.servlet.http.HttpServletResponse
  * @date : 2018/12/20
  * @description : 文件保存处理
  */
-@Service("FileProcessService")
-@ConfigurationProperties(prefix = "stream.http.multipart")
-open class FileProcessServiceImpl(private var location: String? = null) : IFileProcessService {
+@Service
+open class FileIOServiceImpl @Autowired constructor(
+        private val mProperties: CoreProperties
+) : IFileIOService {
 
     /**下载资源*/
     @Throws(IOException::class)
@@ -49,22 +52,22 @@ open class FileProcessServiceImpl(private var location: String? = null) : IFileP
 
     /**保存资源*/
     @Throws(BaseException::class)
-    override fun saveData(multipartFile: Array<MultipartFile>): List<TableFileResource> {
-        val fileList = ArrayList<TableFileResource>()
-        var outputStream: FileOutputStream? = null
-        var inputStream: InputStream? = null
+    override fun saveData(multipartFile: Array<MultipartFile>): List<FileResourceBo> {
+        val fileList = ArrayList<FileResourceBo>()
+        var outputStream: FileOutputStream?
+        var inputStream: InputStream?
         if (multipartFile.isEmpty()) {
             throw BaseException("文件上传不能为空")
         }
         for (file in multipartFile) {
             val dateFolder = DateUtils.format(Date(), "yyyyMMdd")
-            val folderUrl = location!! + dateFolder!!
+            val folderUrl = mProperties.filePath + "/" + dateFolder!!
             val folder = File(folderUrl)
             if (!folder.exists()) {
                 folder.mkdirs()
             }
             val fileInfo = getUUIDFileName(file)
-            val uuidFileName = fileInfo[0] + "." + fileInfo[1]
+            val uuidFileName = fileInfo[0] + fileInfo[1]
             val originalUrl = "$folderUrl/$uuidFileName"
             inputStream = file.inputStream
             outputStream = FileOutputStream(originalUrl)
@@ -72,8 +75,12 @@ open class FileProcessServiceImpl(private var location: String? = null) : IFileP
             var len: Int = inputStream!!.read(data)
             while (len != -1) {
                 len = inputStream.read(data)
-                outputStream.write(data, 0, len)
+                if (len != -1) {
+                    outputStream.write(data, 0, len)
+                }
             }
+            inputStream.close()
+            outputStream.close()
             when (fileInfo[1].toLowerCase()) {
                 "jpg", "jpeg", "png" -> {
                     // 如果是图片，保存一份缩略图
@@ -84,14 +91,12 @@ open class FileProcessServiceImpl(private var location: String? = null) : IFileP
                 }
             }
 
-            fileList.add(TableFileResource(
+            fileList.add(FileResourceBo(
                     url = "resource/$dateFolder/$uuidFileName",
                     filename = uuidFileName,
                     type = fileInfo[1]
             ))
         }
-        inputStream!!.close()
-        outputStream!!.close()
         return fileList
     }
 

@@ -1,14 +1,13 @@
 package vip.qsos.ktorm.module.user.entity
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
+import org.apache.commons.lang.StringUtils
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -37,7 +36,7 @@ object DBLoginUser : MBaseTable<TableLoginUser>(TAB_NAME) {
                 password = row[password]!!,
                 avatar = row[avatar],
                 birth = row[birth],
-                sexuality = row[sexuality]
+                sexuality = row[sexuality]!!
         )
     }
 
@@ -58,37 +57,36 @@ object DBLoginUser : MBaseTable<TableLoginUser>(TAB_NAME) {
 
 @javax.persistence.Entity
 @javax.persistence.Table(name = TAB_NAME)
-@ApiModel(value = "聊天群实体")
 class TableLoginUser : AbsTable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(name = "userId", value = "用户ID")
     var userId: Int = -1
 
     @Column(name = "user_name")
-    @ApiModelProperty(name = "sessionId", value = "用户姓名")
     var userName: String = ""
 
     @Column(name = "account")
-    @ApiModelProperty(name = "account", value = "用户账号")
     var account: String = ""
 
     @Column(name = "password")
-    @ApiModelProperty(name = "password", value = "用户密码")
     var password: String = ""
 
     @Column(name = "avatar")
-    @ApiModelProperty(name = "avatar", value = "头像,http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png")
-    var avatar: String? = ""
+    var avatar: String? = null
+        get() {
+            return if (StringUtils.isEmpty(field)) {
+                "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
+            } else {
+                field
+            }
+        }
 
     @Column(name = "birth")
-    @ApiModelProperty(name = "birth", value = "出生,1969-05-05")
     var birth: String? = null
 
     @Column(name = "sexuality")
-    @ApiModelProperty(name = "sexuality", value = "性别,0女 1男 null未知")
-    var sexuality: Int? = null
+    var sexuality: Int = -1
 
     constructor()
     constructor(
@@ -98,10 +96,10 @@ class TableLoginUser : AbsTable {
             password: String,
             avatar: String?,
             birth: String?,
-            sexuality: Int?,
+            sexuality: Int = -1,
 
-            gmtCreate: LocalDate = LocalDate.now(),
-            gmtUpdate: LocalDate = LocalDate.now(),
+            gmtCreate: LocalDateTime = LocalDateTime.now(),
+            gmtUpdate: LocalDateTime = LocalDateTime.now(),
             deleted: Boolean = false
     ) {
         this.userId = userId

@@ -7,12 +7,8 @@ import me.liuwj.ktorm.entity.findListByIds
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.stereotype.Service
 import vip.qsos.ktorm.module.chat.entity.*
+import vip.qsos.ktorm.util.DateUtils
 
-/**
- * @author : 华清松
- * @date : 2019/11/2
- * @description : 聊天消息服务
- */
 @Service
 open class ChatGroupService : IChatService.IGroup {
 
@@ -22,29 +18,28 @@ open class ChatGroupService : IChatService.IGroup {
         }.map {
             it.sessionId
         }.toSet()
-        val groupList = DBChatGroup.findListByIds(groupIds).map { group ->
-            val chatGroup = ChatGroupBo.getVo(group)
+        return DBChatGroup.findListByIds(groupIds).map { group ->
+            val chatGroup = ChatGroupBo().getBo(group) as ChatGroupBo
 
             val message = group.lastMessageId?.let { messageId ->
-                ChatMessage.getVo(DBChatMessage.findOne {
+                ChatMessageBo().getBo(DBChatMessage.findOne {
                     it.messageId eq messageId
-                })
+                }) as ChatMessageBo
             }
             message?.let {
                 val chatUserWithMessage = DBChatUserWithMessage.findOne {
                     it.messageId eq message.messageId
                 }!!
-                val user = ChatUserBo.getBo(DBChatUser.findById(chatUserWithMessage.userId)!!)
+                val user = ChatUserBo().getBo(DBChatUser.findById(chatUserWithMessage.userId)!!) as ChatUserBo
 
-                chatGroup.lastMessage = ChatMessageBo(
+                chatGroup.lastMessage = ChatMessageInfoBo(
                         user = user,
-                        createTime = chatUserWithMessage.gmtCreate,
+                        createTime = DateUtils.format(chatUserWithMessage.gmtCreate),
                         message = message
                 )
             }
             chatGroup
         }
-        return groupList
     }
 
     override fun getGroupById(groupId: Int): ChatGroupBo {

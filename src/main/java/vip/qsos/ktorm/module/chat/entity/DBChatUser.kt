@@ -5,9 +5,10 @@ import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
+import org.apache.commons.lang.StringUtils
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -34,9 +35,9 @@ object DBChatUser : MBaseTable<TableChatUser>(TAB_NAME) {
                 birth = row[birth],
                 sexuality = row[sexuality]!!,
 
-                gmtCreate = row[DBChatUserWithMessage.gmtCreate]!!,
-                gmtUpdate = row[DBChatUserWithMessage.gmtUpdate]!!,
-                deleted = row[DBChatUserWithMessage.deleted]!!
+                gmtCreate = row[gmtCreate]!!,
+                gmtUpdate = row[gmtUpdate]!!,
+                deleted = row[deleted]!!
         )
     }
 
@@ -67,23 +68,30 @@ class TableChatUser : AbsTable {
 
     @Column(name = "avatar")
     var avatar: String? = null
+        get() {
+            return if (StringUtils.isEmpty(field)) {
+                "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
+            } else {
+                field
+            }
+        }
 
     @Column(name = "birth")
     var birth: String? = ""
 
     @Column(name = "sexuality", nullable = false)
-    var sexuality: Int? = -1
+    var sexuality: Int = -1
 
     constructor()
     constructor(
             userId: Int = -1,
             userName: String,
-            avatar: String? = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png",
+            avatar: String? = null,
             birth: String? = null,
-            sexuality: Int? = null,
+            sexuality: Int = -1,
 
-            gmtCreate: LocalDate = LocalDate.now(),
-            gmtUpdate: LocalDate = LocalDate.now(),
+            gmtCreate: LocalDateTime = LocalDateTime.now(),
+            gmtUpdate: LocalDateTime = LocalDateTime.now(),
             deleted: Boolean = false
     ) {
         this.userId = userId

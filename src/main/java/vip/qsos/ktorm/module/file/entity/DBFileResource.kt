@@ -1,13 +1,12 @@
 package vip.qsos.ktorm.module.file.entity
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
+import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.*
 
 private const val TAB_NAME = "sys_resource"
@@ -20,14 +19,14 @@ object DBFileResource : MBaseTable<TableFileResource>(TAB_NAME) {
     val fileId by int("id").primaryKey()
     val url by varchar("file_url")
     val filename by varchar("file_name")
-    val type by varchar("type")
+    val type by varchar("file_type")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableFileResource {
         return TableFileResource(
                 fileId = row[fileId]!!,
                 url = row[url]!!,
                 filename = row[filename]!!,
-                type = row[type]!!,
+                type = row[type],
 
                 gmtCreate = row[gmtCreate]!!,
                 gmtUpdate = row[gmtUpdate]!!,
@@ -36,30 +35,32 @@ object DBFileResource : MBaseTable<TableFileResource>(TAB_NAME) {
     }
 
     override fun add(t: TableFileResource): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return this.insertAndGenerateKey {
+            it.url to t.url
+            it.filename to t.filename
+            it.type to t.type
+            it.gmtCreate to t.gmtCreate
+            it.gmtUpdate to t.gmtUpdate
+            it.deleted to t.deleted
+        }
     }
 }
 
 @Entity
 @Table(name = TAB_NAME)
-@ApiModel(value = "文件对象")
 class TableFileResource : AbsTable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(name = "fileId", value = "文件ID")
     var fileId: Int = -1
 
     @Column(name = "file_url")
-    @ApiModelProperty(name = "url", value = "文件链接")
     var url: String? = null
 
     @Column(name = "file_name")
-    @ApiModelProperty(name = "filename", value = "文件名称")
     var filename: String? = null
 
     @Column(name = "file_type")
-    @ApiModelProperty(name = "type", value = "文件类型")
     var type: String? = null
 
     constructor()
@@ -69,8 +70,8 @@ class TableFileResource : AbsTable {
             filename: String?,
             type: String?,
 
-            gmtCreate: LocalDate = LocalDate.now(),
-            gmtUpdate: LocalDate = LocalDate.now(),
+            gmtCreate: LocalDateTime = LocalDateTime.now(),
+            gmtUpdate: LocalDateTime = LocalDateTime.now(),
             deleted: Boolean = false
     ) {
         this.fileId = fileId
@@ -83,9 +84,3 @@ class TableFileResource : AbsTable {
         this.deleted = deleted
     }
 }
-
-data class HttpFileEntity(
-        var url: String?,
-        var filename: String?,
-        var type: String? = null
-)

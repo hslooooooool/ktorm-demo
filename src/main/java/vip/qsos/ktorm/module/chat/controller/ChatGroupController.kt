@@ -7,8 +7,7 @@ import vip.qsos.ktorm.module.chat.service.IChatService
 import vip.qsos.ktorm.util.MResult
 
 @RestController
-open class ChatGroupController(
-        @Autowired
+open class ChatGroupController @Autowired constructor(
         private val mChatGroupService: IChatService.IGroup
 ) : IChatController.IGroup {
 

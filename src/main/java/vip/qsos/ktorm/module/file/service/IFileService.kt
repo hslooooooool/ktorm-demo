@@ -1,14 +1,18 @@
 package vip.qsos.ktorm.module.file.service
 
-import vip.qsos.ktorm.module.file.entity.HttpFileEntity
-import vip.qsos.ktorm.module.file.entity.TableFileResource
+import org.springframework.web.multipart.MultipartFile
+import vip.qsos.ktorm.module.file.entity.FileResourceBo
+import javax.servlet.http.HttpServletResponse
 
 /**
  * @author : 华清松
- * @date : 2018/12/28
- * @description : TODO类说明
+ * @description : 文件数据库操作
  */
 interface IFileService {
+    val mFileIOService: IFileIOService
+    /**新增文件*/
+    fun upload(files: Array<MultipartFile>): List<FileResourceBo>
 
-    fun save(files: List<TableFileResource>): List<HttpFileEntity>
+    /**文件下载*/
+    fun downLoad(httpResponse: HttpServletResponse, url: String)
 }

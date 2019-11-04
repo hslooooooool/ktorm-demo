@@ -33,12 +33,8 @@ class ChatUserService : IChatService.IUser {
     }
 
     override fun getUserById(userId: Int): ChatUserBo {
-        return DBChatUser.findById(userId)?.let {
-            ChatUserBo(
-                    userId = it.userId, userName = it.userName, avatar = it.avatar,
-                    birth = it.birth, sexuality = it.sexuality
-            )
-        } ?: throw BaseException("无法找到")
+        return ChatUserBo().getBo(DBChatUser.findById(userId)) as ChatUserBo?
+                ?: throw BaseException("用户不存在")
     }
 
     override fun getUserListBySessionId(sessionId: Int): List<ChatUserBo> {
@@ -54,7 +50,7 @@ class ChatUserService : IChatService.IUser {
         )
         val id = DBChatUser.add(result) as Int
         result.userId = id
-        return ChatUserBo.getBo(result)
+        return ChatUserBo().getBo(result) as ChatUserBo
     }
 
     override fun deleteUser(userId: Int): Boolean {

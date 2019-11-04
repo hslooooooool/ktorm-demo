@@ -1,7 +1,9 @@
 package vip.qsos.ktorm.util
 
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 /**
  * @author : 华清松
@@ -16,5 +18,10 @@ object DateUtils {
             return df.format(date)
         }
         return null
+    }
+
+    fun format(date: LocalDateTime): String {
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        return date.format(dateTimeFormatter)
     }
 }

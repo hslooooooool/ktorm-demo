@@ -1,15 +1,13 @@
 package vip.qsos.ktorm.module.chat.entity
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
-import me.liuwj.ktorm.dsl.insertAndGenerateKey
+import me.liuwj.ktorm.dsl.insert
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
+import org.apache.commons.lang.StringUtils
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
-import vip.qsos.ktorm.module.file.entity.DBFileResource
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Id
 
@@ -34,15 +32,15 @@ object DBChatGroup : MBaseTable<TableChatGroup>(TAB_NAME) {
                 avatar = row[avatar]!!,
                 notice = row[notice],
                 lastMessageId = row[lastMessageId],
-
-                gmtCreate = row[DBFileResource.gmtCreate]!!,
-                gmtUpdate = row[DBFileResource.gmtUpdate]!!,
-                deleted = row[DBFileResource.deleted]!!
+                gmtCreate = row[gmtCreate]!!,
+                gmtUpdate = row[gmtUpdate]!!,
+                deleted = row[deleted]!!
         )
     }
 
     override fun add(t: TableChatGroup): Any {
-        return this.insertAndGenerateKey {
+        this.insert {
+            it.groupId to t.groupId
             it.name to t.name
             it.avatar to t.avatar
             it.notice to t.notice
@@ -51,45 +49,47 @@ object DBChatGroup : MBaseTable<TableChatGroup>(TAB_NAME) {
             it.gmtUpdate to t.gmtUpdate
             it.deleted to t.deleted
         }
+        return t.groupId
     }
 }
 
 @javax.persistence.Entity
 @javax.persistence.Table(name = TAB_NAME)
-@ApiModel(value = "聊天群实体")
 class TableChatGroup : AbsTable {
 
     @Id
-    @Column(name = "id")
-    @ApiModelProperty(name = "groupId", value = "聊天群ID，同sessionId")
+    @Column(name = "id", unique = true)
     var groupId: Int = -1
 
     @Column(name = "name")
-    @ApiModelProperty(name = "name", value = "群名称")
     var name: String = ""
 
     @Column(name = "avatar")
-    @ApiModelProperty(name = "avatar", value = "群封面,默认http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png")
-    var avatar: String = ""
+    var avatar: String? = null
+        get() {
+            return if (StringUtils.isEmpty(field)) {
+                "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
+            } else {
+                field
+            }
+        }
 
     @Column(name = "notice")
-    @ApiModelProperty(name = "notice", value = "群公告")
-    var notice: String? = ""
+    var notice: String? = null
 
     @Column(name = "last_message_id")
-    @ApiModelProperty(name = "lastMessageId", value = "最后一条消息ID")
     var lastMessageId: Int? = null
 
     constructor()
     constructor(
             groupId: Int,
             name: String,
-            avatar: String = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png",
+            avatar: String? = null,
             notice: String?,
             lastMessageId: Int? = null,
 
-            gmtCreate: LocalDate = LocalDate.now(),
-            gmtUpdate: LocalDate = LocalDate.now(),
+            gmtCreate: LocalDateTime = LocalDateTime.now(),
+            gmtUpdate: LocalDateTime = LocalDateTime.now(),
             deleted: Boolean = false
     ) {
         this.groupId = groupId

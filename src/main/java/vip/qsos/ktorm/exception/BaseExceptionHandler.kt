@@ -16,17 +16,20 @@ class BaseExceptionHandler {
 
     @ExceptionHandler(BaseException::class)
     fun handleRRException(e: BaseException): MResult<Nothing> {
+        e.printStackTrace()
         return MResult<Nothing>().error(e.code, e.message ?: "服务器异常")
     }
 
     @ExceptionHandler(DuplicateKeyException::class)
     fun handleDuplicateKeyException(e: DuplicateKeyException): MResult<Nothing> {
+        e.printStackTrace()
         LogUtils.e(e.message ?: "未知异常")
         return MResult<Nothing>().error(500, "数据错误")
     }
 
     @ExceptionHandler(Exception::class)
     fun handleException(e: Exception): MResult<Nothing> {
+        e.printStackTrace()
         LogUtils.e(e.message ?: "未知异常")
         return MResult<Nothing>().error(500, "服务器异常")
     }
