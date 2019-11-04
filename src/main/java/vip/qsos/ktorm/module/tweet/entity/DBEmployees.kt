@@ -38,21 +38,23 @@ object DBEmployees : BaseTable<TableEmployee>(TAB_NAME) {
 
 @javax.persistence.Entity
 @javax.persistence.Table(name = TAB_NAME)
-@ApiModel(value = "雇员实体")
+@ApiModel(description = "雇员")
 data class TableEmployee(
         @Id
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @ApiModelProperty(name = "id", value = "雇员ID", dataType = "Int")
+        @ApiModelProperty(name = "id", value = "雇员ID")
         var id: Int? = null,
         @Column(name = "name")
-        @ApiModelProperty(name = "name", value = "雇员名称", dataType = "String")
+        @ApiModelProperty(name = "name", value = "雇员名称")
         var name: String,
         @Column(name = "manager_id")
-        @ApiModelProperty(name = "managerId", value = "管理者ID", dataType = "Int")
+        @ApiModelProperty(name = "managerId", value = "管理者ID")
         var managerId: Int?,
         @Column(name = "job")
+        @ApiModelProperty(name = "job", value = "雇员职位")
         var job: String?,
         @Column(name = "head")
+        @ApiModelProperty(name = "head", value = "雇员头像")
         var head: String?
 )

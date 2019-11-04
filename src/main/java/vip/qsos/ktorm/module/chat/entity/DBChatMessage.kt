@@ -47,7 +47,6 @@ class TableChatMessage : AbsTable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(name = "messageId", value = "聊天消息ID", dataType = "Int")
     var messageId: Int = -1
 
     @Column(name = "sequence")
@@ -82,15 +81,5 @@ class TableChatMessage : AbsTable {
         this.gmtCreate = gmtCreate
         this.gmtUpdate = gmtUpdate
         this.deleted = deleted
-    }
-
-    /**转化为业务实体*/
-    fun toChatMessage(): ChatMessage {
-        return ChatMessage(
-                this.sessionId,
-                this.messageId,
-                this.sequence,
-                ChatMessage.jsonToContent(this.content)
-        )
     }
 }

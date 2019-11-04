@@ -17,7 +17,7 @@ import java.time.LocalDate
 @ApiModel(description = "聊天消息")
 data class ChatMessage(
         /**@see ChatSessionBo.sessionId*/
-        @ApiModelProperty(value = "会话ID", required = false)
+        @ApiModelProperty(value = "会话ID", required = true)
         var sessionId: Int = -1,
         @ApiModelProperty(value = "消息ID", required = false)
         var messageId: Int = -1,
@@ -58,8 +58,12 @@ data class ChatMessage(
     }
 }
 
+@ApiModel(description = "聊天消息")
 data class ChatMessageBo(
+        @ApiModelProperty(value = "聊天消息发送人信息", required = true)
         val user: ChatUserBo,
+        @ApiModelProperty(value = "聊天消息发送时间", required = true)
         val createTime: LocalDate,
+        @ApiModelProperty(value = "聊天消息", required = true)
         val message: ChatMessage
 )

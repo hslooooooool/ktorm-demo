@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty
  * @date : 2019-05-17
  * @description : 统一返回结果
  */
-@ApiModel(value = "统一返回结果")
+@ApiModel(description = "统一返回结果")
 class MResult<T> {
     @ApiModelProperty(value = "返回码", example = "200", notes = "成功：200")
     var code: Int = 200
