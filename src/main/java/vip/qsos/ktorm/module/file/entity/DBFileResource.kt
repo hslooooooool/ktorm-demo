@@ -34,6 +34,10 @@ object DBFileResource : MBaseTable<TableFileResource>(TAB_NAME) {
                 deleted = row[deleted]!!
         )
     }
+
+    override fun add(t: TableFileResource): Any {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
 
 @Entity

@@ -2,8 +2,8 @@ package vip.qsos.ktorm.module.tweet.entity
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import me.liuwj.ktorm.dsl.QueryRowSet
-import me.liuwj.ktorm.schema.BaseTable
+import me.liuwj.ktorm.entity.Entity
+import me.liuwj.ktorm.schema.Table
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
 import javax.persistence.Column
@@ -18,28 +18,18 @@ private const val TAB_NAME = "t_employee"
  * @date : 2019-05-17
  * @description : TODO 类说明，描述此类的类型和用途
  */
-object DBEmployees : BaseTable<TableEmployee>(TAB_NAME) {
-    val id by int("id").primaryKey()
-    val name by varchar("name")
-    val job by varchar("job")
-    val head by varchar("head")
-    val managerId by int("manager_id")
-
-    override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableEmployee {
-        return TableEmployee(
-                id = row[id],
-                name = row[name] ?: "",
-                job = row[job] ?: "",
-                head = row[head] ?: "",
-                managerId = row[managerId]
-        )
-    }
+object DBEmployees : Table<TableEmployee>(TAB_NAME) {
+    val id by int("id").primaryKey().bindTo { it.id }
+    val name by varchar("name").bindTo { it.name }
+    val job by varchar("job").bindTo { it.job }
+    val head by varchar("head").bindTo { it.head }
+    val managerId by int("manager_id").bindTo { it.managerId }
 }
 
 @javax.persistence.Entity
 @javax.persistence.Table(name = TAB_NAME)
 @ApiModel(description = "雇员")
-data class TableEmployee(
+data class Employee(
         @Id
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,4 +47,24 @@ data class TableEmployee(
         @Column(name = "head")
         @ApiModelProperty(name = "head", value = "雇员头像")
         var head: String?
-)
+) {
+    fun toTable(): TableEmployee {
+        val mTableEmployee = TableEmployee()
+        mTableEmployee.id = id
+        mTableEmployee.name = name
+        mTableEmployee.managerId = managerId
+        mTableEmployee.job = job
+        mTableEmployee.head = head
+        return mTableEmployee
+    }
+}
+
+interface TableEmployee : Entity<TableEmployee> {
+    companion object : Entity.Factory<TableEmployee>()
+
+    var id: Int?
+    var name: String
+    var managerId: Int?
+    var job: String?
+    var head: String?
+}

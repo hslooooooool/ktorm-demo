@@ -1,6 +1,5 @@
 package vip.qsos.ktorm.module
 
-import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.BaseTable
 import me.liuwj.ktorm.schema.boolean
 import me.liuwj.ktorm.schema.date
@@ -33,10 +32,6 @@ abstract class MBaseTable<T : AbsTable>(name: String) : BaseTable<T>(name) {
     val gmtUpdate by date("gmt_update")
     val deleted by boolean("deleted")
 
-    fun add(t: T): Any {
-        return this.insertAndGenerateKey {
-            it to t
-        }
-    }
+    abstract fun add(t: T): Any
 
 }

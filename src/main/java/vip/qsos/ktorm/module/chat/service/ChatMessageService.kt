@@ -9,7 +9,6 @@ import me.liuwj.ktorm.entity.findOne
 import org.springframework.stereotype.Service
 import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.chat.entity.*
-import vip.qsos.ktorm.module.tweet.entity.DBEmployees
 
 /**
  * @author : 华清松
@@ -107,7 +106,9 @@ class ChatMessageService : IChatService.IMessage {
     }
 
     override fun deleteMessage(messageId: Int): Boolean {
-        val result = DBEmployees.delete { it.managerId.eq(messageId.toInt()) }
+        val result = DBChatMessage.delete {
+            it.messageId eq messageId
+        }
         return result == 1
     }
 

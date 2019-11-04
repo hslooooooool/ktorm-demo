@@ -3,6 +3,7 @@ package vip.qsos.ktorm.module.chat.entity
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
+import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.int
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
@@ -33,6 +34,16 @@ object DBChatUserWithSession : MBaseTable<TableChatUserWithSession>(TAB_NAME) {
                 gmtUpdate = row[DBChatUserWithMessage.gmtUpdate]!!,
                 deleted = row[DBChatUserWithMessage.deleted]!!
         )
+    }
+
+    override fun add(t: TableChatUserWithSession): Any {
+        return this.insertAndGenerateKey {
+            it.userId to t.userId
+            it.sessionId to t.sessionId
+            it.gmtCreate to t.gmtCreate
+            it.gmtUpdate to t.gmtUpdate
+            it.deleted to t.deleted
+        }
     }
 }
 

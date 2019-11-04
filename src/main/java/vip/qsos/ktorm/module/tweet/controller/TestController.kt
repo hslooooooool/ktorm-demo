@@ -1,11 +1,16 @@
 package vip.qsos.ktorm.module.tweet.controller
 
 import io.swagger.annotations.ApiOperation
-import me.liuwj.ktorm.dsl.*
+import me.liuwj.ktorm.dsl.delete
+import me.liuwj.ktorm.dsl.deleteAll
+import me.liuwj.ktorm.dsl.eq
+import me.liuwj.ktorm.dsl.update
+import me.liuwj.ktorm.entity.add
 import me.liuwj.ktorm.entity.findAll
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.web.bind.annotation.*
 import vip.qsos.ktorm.module.tweet.entity.DBEmployees
+import vip.qsos.ktorm.module.tweet.entity.Employee
 import vip.qsos.ktorm.module.tweet.entity.TableEmployee
 import vip.qsos.ktorm.util.MResult
 
@@ -15,17 +20,12 @@ open class TestController {
 
     @PostMapping("/add")
     @ApiOperation(value = "测试接口")
-    open fun add(): MResult<TableEmployee> {
-        val e = TableEmployee(name = "Name", job = "JOB2", head = "http://img.sccnn.com/bimg/338/42729.jpg", managerId = 1)
-        val result = DBEmployees.insert {
-            it.name to e.name
-            it.head to e.head
-            it.job to e.job
-            it.managerId to e.managerId
-        }
+    open fun add(): MResult<Employee> {
+        val e = Employee(name = "Name", job = "JOB2", head = "http://img.sccnn.com/bimg/338/42729.jpg", managerId = 1)
+        val result = DBEmployees.add(e.toTable())
         e.id = result
-        println("新增1条数据")
-        return MResult<TableEmployee>().result(e)
+        println("新增 $result 条数据")
+        return MResult<Employee>().result(e)
     }
 
     @DeleteMapping("/delete")

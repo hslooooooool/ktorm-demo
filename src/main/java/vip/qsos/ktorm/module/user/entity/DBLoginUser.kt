@@ -3,6 +3,7 @@ package vip.qsos.ktorm.module.user.entity
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
+import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
 import vip.qsos.ktorm.module.AbsTable
@@ -38,6 +39,20 @@ object DBLoginUser : MBaseTable<TableLoginUser>(TAB_NAME) {
                 birth = row[birth],
                 sexuality = row[sexuality]
         )
+    }
+
+    override fun add(t: TableLoginUser): Any {
+        return this.insertAndGenerateKey {
+            it.userName to t.userName
+            it.account to t.account
+            it.password to t.password
+            it.avatar to t.avatar
+            it.birth to t.birth
+            it.sexuality to t.sexuality
+            it.gmtCreate to t.gmtCreate
+            it.gmtUpdate to t.gmtUpdate
+            it.deleted to t.deleted
+        }
     }
 }
 
@@ -100,18 +115,5 @@ class TableLoginUser : AbsTable {
         this.gmtCreate = gmtCreate
         this.gmtUpdate = gmtUpdate
         this.deleted = deleted
-    }
-
-    /**转化为业务实体*/
-    fun toLoginUser(): LoginUser {
-        return LoginUser(
-                userId = this.userId,
-                account = this.account,
-                password = this.password,
-                userName = this.userName,
-                avatar = this.avatar,
-                birth = this.birth,
-                sexuality = this.sexuality
-        )
     }
 }
