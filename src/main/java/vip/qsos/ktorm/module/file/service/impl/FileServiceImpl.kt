@@ -17,7 +17,7 @@ open class FileServiceImpl @Autowired constructor(
 ) : IFileService {
 
     @Transactional(rollbackFor = [BaseException::class])
-    override fun upload(files: Array<MultipartFile>): List<FileResourceBo> {
+    override fun upload(files: List<MultipartFile>): List<FileResourceBo> {
         val saveFiles = mFileIOService.saveData(files)
         val result = arrayListOf<FileResourceBo>()
         saveFiles.forEach {

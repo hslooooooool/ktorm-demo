@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse
 interface IFileService {
     val mFileIOService: IFileIOService
     /**新增文件*/
-    fun upload(files: Array<MultipartFile>): List<FileResourceBo>
+    fun upload(files: List<MultipartFile>): List<FileResourceBo>
 
     /**文件下载*/
     fun downLoad(httpResponse: HttpServletResponse, url: String)

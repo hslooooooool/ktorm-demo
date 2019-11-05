@@ -8,8 +8,9 @@ import vip.qsos.ktorm.config.CoreProperties
 import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.file.entity.FileResourceBo
 import vip.qsos.ktorm.module.file.service.IFileIOService
-import vip.qsos.ktorm.util.DateUtils
 import java.io.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.servlet.http.HttpServletResponse
 
@@ -52,27 +53,25 @@ open class FileIOServiceImpl @Autowired constructor(
 
     /**保存资源*/
     @Throws(BaseException::class)
-    override fun saveData(multipartFile: Array<MultipartFile>): List<FileResourceBo> {
+    override fun saveData(multipartFile: List<MultipartFile>): List<FileResourceBo> {
         val fileList = ArrayList<FileResourceBo>()
         var outputStream: FileOutputStream?
         var inputStream: InputStream?
-        if (multipartFile.isEmpty()) {
-            throw BaseException("文件上传不能为空")
-        }
         for (file in multipartFile) {
-            val dateFolder = DateUtils.format(Date(), "yyyyMMdd")
-            val folderUrl = mProperties.filePath + "/" + dateFolder!!
-            val folder = File(folderUrl)
+            val dateFolder = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+            val folderPath = "${mProperties.filePath}/$dateFolder"
+            val folder = File(folderPath)
             if (!folder.exists()) {
                 folder.mkdirs()
             }
             val fileInfo = getUUIDFileName(file)
             val uuidFileName = fileInfo[0] + fileInfo[1]
-            val originalUrl = "$folderUrl/$uuidFileName"
+            val originalUrl = "$folderPath/$uuidFileName"
+
             inputStream = file.inputStream
             outputStream = FileOutputStream(originalUrl)
             val data = ByteArray(1024)
-            var len: Int = inputStream!!.read(data)
+            var len = 0
             while (len != -1) {
                 len = inputStream.read(data)
                 if (len != -1) {
@@ -84,7 +83,7 @@ open class FileIOServiceImpl @Autowired constructor(
             when (fileInfo[1].toLowerCase()) {
                 "jpg", "jpeg", "png" -> {
                     // 如果是图片，保存一份缩略图
-                    val changUrl = "$folderUrl/min_$uuidFileName"
+                    val changUrl = "$folderPath/min_$uuidFileName"
                     changPicture(originalUrl, changUrl)
                 }
                 else -> {

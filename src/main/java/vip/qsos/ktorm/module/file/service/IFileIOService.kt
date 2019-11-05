@@ -19,7 +19,7 @@ interface IFileIOService {
 
     /**保存资源*/
     @Throws(BaseException::class)
-    fun saveData(multipartFile: Array<MultipartFile>): List<FileResourceBo>
+    fun saveData(multipartFile: List<MultipartFile>): List<FileResourceBo>
 
 
 }
