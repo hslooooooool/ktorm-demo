@@ -2,9 +2,9 @@ package vip.qsos.ktorm.module.file.service.impl
 
 import net.coobird.thumbnailator.Thumbnails
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import vip.qsos.ktorm.config.CoreProperties
 import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.file.entity.FileResourceBo
 import vip.qsos.ktorm.module.file.service.IFileIOService
@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse
  */
 @Service
 open class FileIOServiceImpl @Autowired constructor(
-        private val mProperties: CoreProperties
+        private val mProperties: MultipartProperties
 ) : IFileIOService {
 
     /**下载资源*/
@@ -59,7 +59,7 @@ open class FileIOServiceImpl @Autowired constructor(
         var inputStream: InputStream?
         for (file in multipartFile) {
             val dateFolder = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-            val folderPath = "${mProperties.filePath}/$dateFolder"
+            val folderPath = "${mProperties.location}/$dateFolder/"
             val folder = File(folderPath)
             if (!folder.exists()) {
                 folder.mkdirs()
@@ -81,9 +81,9 @@ open class FileIOServiceImpl @Autowired constructor(
             inputStream.close()
             outputStream.close()
             when (fileInfo[1].toLowerCase()) {
-                "jpg", "jpeg", "png" -> {
-                    // 如果是图片，保存一份缩略图
-                    val changUrl = "$folderPath/min_$uuidFileName"
+                ".jpg", ".jpeg", ".png" -> {
+                    // 如果是图片，保存一份缩略图，名称后加‘-min’即可访问
+                    val changUrl = "$folderPath/$uuidFileName-min"
                     changPicture(originalUrl, changUrl)
                 }
                 else -> {
@@ -91,7 +91,7 @@ open class FileIOServiceImpl @Autowired constructor(
             }
 
             fileList.add(FileResourceBo(
-                    url = "resource/$dateFolder/$uuidFileName",
+                    url = "${mProperties.location}/$dateFolder/$uuidFileName",
                     filename = uuidFileName,
                     type = fileInfo[1]
             ))

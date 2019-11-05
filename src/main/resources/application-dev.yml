@@ -49,7 +49,7 @@ spring:
       #文件写入磁盘的阈值，默认是0
       file-size-threshold: 0
       #上传文件的临时保存位置
-      location: D:\\upload
+      location: D:/file-server
       #单个文件的最大值，默认是1MB
       max-file-size: 10MB
       #多个文件上传时的总大小 值，默认是10MB
