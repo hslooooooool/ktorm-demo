@@ -23,10 +23,10 @@ spring:
     auto: true
     proxy-target-class: false
 
-  servlet:
-    multipart:
-      max-file-size: 100MB
-      max-request-size: 10MB
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
       enabled: true
 
 

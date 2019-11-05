@@ -1,36 +1,40 @@
 package vip.qsos.ktorm.module.user.controller
 
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.ApiSort
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import vip.qsos.ktorm.module.user.entity.LoginUser
+import vip.qsos.ktorm.module.user.entity.LoginUserBo
 import vip.qsos.ktorm.util.MResult
 
-/**
- * @author : 华清松
- * @description : 用户相关接口
- */
+@Api(tags = ["登录用户"])
+@ApiSort(0)
+@RequestMapping("/user")
 interface ILoginUserModel {
 
-    /**账号密码登录
-     * @param account 账号
-     * @param password 密码
-     * @return 登录用户数据
-     * */
+    @ApiOperation(value = "账号密码登录")
     @GetMapping("/login")
     fun login(
-            @RequestParam("account") account: String,
-            @RequestParam("password") password: String
-    ): MResult<LoginUser>
+            @RequestParam("account")
+            @ApiParam(value = "账号", required = true)
+            account: String,
+            @RequestParam("password")
+            @ApiParam(value = "密码", required = true)
+            password: String
+    ): MResult<LoginUserBo>
 
-    /**账号密码注册
-     * @param account 账号
-     * @param password 密码
-     * @return 注册用户数据
-     * */
+    @ApiOperation(value = "账号密码注册")
     @PostMapping("/register")
     fun register(
-            @RequestParam("account") account: String,
-            @RequestParam("password") password: String
-    ): MResult<LoginUser>
+            @RequestParam("account")
+            @ApiParam(value = "账号", required = true)
+            account: String,
+            @RequestParam("password")
+            @ApiParam(value = "密码", required = true)
+            password: String
+    ): MResult<LoginUserBo>
 }

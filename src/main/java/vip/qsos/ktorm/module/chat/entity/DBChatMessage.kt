@@ -3,9 +3,12 @@ package vip.qsos.ktorm.module.chat.entity
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
-import me.liuwj.ktorm.schema.BaseTable
+import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
+import vip.qsos.ktorm.module.AbsTable
+import vip.qsos.ktorm.module.MBaseTable
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -18,7 +21,7 @@ private const val TAB_NAME = "t_chat_message"
  * @date : 2019-05-17
  * @description : TODO 类说明，描述此类的类型和用途
  */
-object DBChatMessage : BaseTable<TableChatMessage>(TAB_NAME) {
+object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
     val messageId by int("id").primaryKey()
     val sessionId by int("session_id")
     val sequence by int("sequence")
@@ -29,41 +32,65 @@ object DBChatMessage : BaseTable<TableChatMessage>(TAB_NAME) {
                 messageId = row[messageId]!!,
                 sessionId = row[sessionId] ?: -1,
                 sequence = row[sequence] ?: -1,
-                content = row[content] ?: ""
+                content = row[content] ?: "",
+                gmtCreate = row[gmtCreate]!!,
+                gmtUpdate = row[gmtUpdate]!!,
+                deleted = row[deleted]!!
         )
+    }
+
+    override fun add(t: TableChatMessage): Any {
+        return this.insertAndGenerateKey {
+            it.sessionId to t.sessionId
+            it.sequence to t.sequence
+            it.content to t.content
+            it.gmtCreate to t.gmtCreate
+            it.gmtUpdate to t.gmtUpdate
+            it.deleted to t.deleted
+        }
     }
 }
 
 @javax.persistence.Entity
 @javax.persistence.Table(name = TAB_NAME)
 @ApiModel(value = "聊天消息实体")
-data class TableChatMessage(
-        @Id
-        @Column(name = "id")
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @ApiModelProperty(name = "messageId", value = "聊天消息ID", dataType = "Int")
-        var messageId: Int,
+class TableChatMessage : AbsTable {
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var messageId: Int = -1
 
-        @Column(name = "session_id")
-        @ApiModelProperty(name = "sessionId", value = "会话ID", dataType = "Int")
-        val sessionId: Int,
+    @Column(name = "sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(name = "sequence", value = "消息顺序", dataType = "Int")
+    var sequence: Int = -1
 
-        @Column(name = "sequence")
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @ApiModelProperty(name = "sequence", value = "消息顺序", dataType = "Int")
-        val sequence: Int,
+    @Column(name = "session_id")
+    @ApiModelProperty(name = "sessionId", value = "会话ID", dataType = "Int")
+    var sessionId: Int = -1
 
-        @Column(name = "content")
-        @ApiModelProperty(name = "content", value = "聊天消息内容", dataType = "String")
-        val content: String
-) {
-    /**转化为业务实体*/
-    fun toChatMessage(): ChatMessage {
-        return ChatMessage(
-                this.sessionId,
-                this.messageId,
-                this.sequence,
-                ChatMessage.jsonToContent(this.content)
-        )
+    @Column(name = "content")
+    @ApiModelProperty(name = "content", value = "聊天消息内容", dataType = "String")
+    var content: String = ""
+
+    constructor()
+    constructor(
+            messageId: Int,
+            sessionId: Int,
+            sequence: Int,
+            content: String,
+
+            gmtCreate: LocalDateTime = LocalDateTime.now(),
+            gmtUpdate: LocalDateTime = LocalDateTime.now(),
+            deleted: Boolean = false
+    ) {
+        this.messageId = messageId
+        this.sessionId = sessionId
+        this.sequence = sequence
+        this.content = content
+
+        this.gmtCreate = gmtCreate
+        this.gmtUpdate = gmtUpdate
+        this.deleted = deleted
     }
 }
