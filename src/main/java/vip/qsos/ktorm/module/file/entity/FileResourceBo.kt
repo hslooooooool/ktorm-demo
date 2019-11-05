@@ -31,7 +31,7 @@ class FileResourceBo : IBo<TableFileResource> {
     override fun getBo(table: TableFileResource?): IBo<TableFileResource>? {
         return table?.let {
             FileResourceBo(
-                    url = table.url,
+                    url = "http://192.168.0.103:8085/" + table.url,
                     filename = table.filename,
                     type = table.type
             )
