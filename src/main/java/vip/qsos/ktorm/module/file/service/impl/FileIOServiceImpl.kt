@@ -83,7 +83,7 @@ open class FileIOServiceImpl @Autowired constructor(
             when (fileInfo[1].toLowerCase()) {
                 ".jpg", ".jpeg", ".png" -> {
                     // 如果是图片，保存一份缩略图，名称后加‘-min’即可访问
-                    val changUrl = "$folderPath/$uuidFileName-min"
+                    val changUrl = "$folderPath/" + fileInfo[0] + "-min" + fileInfo[1]
                     changPicture(originalUrl, changUrl)
                 }
                 else -> {
