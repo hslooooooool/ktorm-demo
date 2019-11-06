@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.file.entity.FileResourceBo
 import vip.qsos.ktorm.module.file.service.IFileService
+import vip.qsos.ktorm.util.LogUtils
 import vip.qsos.ktorm.util.MResult
 import javax.servlet.http.HttpServletResponse
 
@@ -17,6 +18,9 @@ class FileController @Autowired constructor(
 
     override fun upLoad(file: MultipartFile): MResult<FileResourceBo> {
         val result = fileService.upload(arrayListOf(file))
+        result.forEach {
+            LogUtils.i("上传了文件${it.filename}")
+        }
         return MResult<FileResourceBo>().result(result[0])
     }
 
@@ -26,6 +30,9 @@ class FileController @Autowired constructor(
             throw BaseException("文件上传不能为空")
         }
         val result = fileService.upload(files)
+        result.forEach {
+            LogUtils.i("上传了文件${it.filename}")
+        }
         return MResult<List<FileResourceBo>>().result(result)
     }
 

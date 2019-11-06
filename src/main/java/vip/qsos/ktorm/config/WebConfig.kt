@@ -24,6 +24,8 @@ open class WebConfig(
         private val mProperties: MultipartProperties
 ) : WebMvcConfigurer {
 
+    private val pattern = "yyyy-MM-dd HH:mm:ss"
+
     override fun addInterceptors(registry: InterceptorRegistry) {
         // 配置请求权限校验与需要校验的请求路径
         registry.addInterceptor(authorizationInterceptor).addPathPatterns("**")
@@ -32,13 +34,13 @@ open class WebConfig(
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
         val gsonHttpMessageConverter = GsonHttpMessageConverter()
         val jsonConfig = GsonBuilder()
-        jsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss")
+        jsonConfig.setDateFormat(pattern)
         converters.add(gsonHttpMessageConverter)
         super.configureMessageConverters(converters)
     }
 
     override fun addFormatters(registry: FormatterRegistry) {
-        registry.addFormatterForFieldType(Date::class.java, DateFormatter("yyyy-MM-dd HH:mm:ss"))
+        registry.addFormatterForFieldType(Date::class.java, DateFormatter(pattern))
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
