@@ -1,5 +1,6 @@
 package vip.qsos.ktorm.module.chat.service
 
+import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.module.chat.entity.form.FormCreateSession
 import vip.qsos.ktorm.module.chat.entity.form.FormCreateUser
@@ -92,6 +93,13 @@ interface IChatService {
          * @return 消息数据
          * */
         fun getMessageById(messageId: Int): ChatMessageBo
+
+        /**获取消息列表数据
+         * @param messageIds 消息ID集合
+         * @return 消息列表数据
+         * */
+        @Throws(BaseException::class)
+        fun getMessageListByIds(messageIds: List<Int>): List<ChatMessageBo>
 
         /**获取会话下的消息列表
          * @param sessionId 会话ID

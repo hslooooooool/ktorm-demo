@@ -5,6 +5,7 @@ import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.dsl.update
 import me.liuwj.ktorm.entity.findById
 import me.liuwj.ktorm.entity.findList
+import me.liuwj.ktorm.entity.findListByIds
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.stereotype.Service
 import vip.qsos.ktorm.exception.BaseException
@@ -17,6 +18,12 @@ class ChatMessageService : IChatService.IMessage {
     override fun getMessageById(messageId: Int): ChatMessageBo {
         return ChatMessageBo().getBo(DBChatMessage.findById(messageId)) as ChatMessageBo?
                 ?: throw BaseException("消息不存在")
+    }
+
+    override fun getMessageListByIds(messageIds: List<Int>): List<ChatMessageBo> {
+        return DBChatMessage.findListByIds(messageIds).map {
+            ChatMessageBo().getBo(it) as ChatMessageBo
+        }
     }
 
     override fun getMessageListBySessionId(sessionId: Int): List<ChatMessageInfoBo> {
