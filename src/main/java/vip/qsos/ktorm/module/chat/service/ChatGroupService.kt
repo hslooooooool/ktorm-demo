@@ -1,11 +1,13 @@
 package vip.qsos.ktorm.module.chat.service
 
 import me.liuwj.ktorm.dsl.eq
+import me.liuwj.ktorm.dsl.update
 import me.liuwj.ktorm.entity.findById
 import me.liuwj.ktorm.entity.findList
 import me.liuwj.ktorm.entity.findListByIds
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.stereotype.Service
+import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.util.DateUtils
 
@@ -43,7 +45,9 @@ open class ChatGroupService : IChatService.IGroup {
     }
 
     override fun getGroupById(groupId: Int): ChatGroupBo {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return DBChatGroup.findById(groupId)?.let {
+            ChatGroupBo().getBo(it) as ChatGroupBo
+        } ?: throw BaseException("群组不存在")
     }
 
     override fun getGroupByBySessionId(sessionId: Int): ChatGroupBo {
@@ -56,6 +60,18 @@ open class ChatGroupService : IChatService.IGroup {
 
     override fun updateGroupName(name: String): ChatGroupBo {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun updateGroupLastTimeline(userId: Int, sessionId: Int, lastMessageId: Int, lastTimeline: Int): ChatGroupBo {
+        DBChatGroup.update {
+            it.lastMessageId to lastMessageId
+            it.lastTimeline to lastTimeline
+            where {
+                it.groupId eq sessionId
+            }
+        }
+        val session = DBChatGroup.findById(sessionId)!!
+        return ChatGroupBo().getBo(session) as ChatGroupBo
     }
 
 }

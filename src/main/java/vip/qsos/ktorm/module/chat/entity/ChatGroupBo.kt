@@ -23,13 +23,16 @@ class ChatGroupBo : IBo<TableChatGroup> {
     var avatar: String? = null
     @ApiModelProperty(name = "notice", value = "群公告")
     var notice: String? = null
-    @ApiModelProperty(name = "lastMessageId", value = "最后一条消息ID")
+    @ApiModelProperty(name = "lastMessage", value = "最后一条消息")
     var lastMessage: ChatMessageInfoBo? = null
+    @ApiModelProperty(name = "lastTimeline", value = "最后一条信息时间线")
+    var lastTimeline: Int = -1
 
     constructor()
     constructor(
             groupId: Int = -1, name: String, createTime: LocalDateTime = LocalDateTime.now(),
-            avatar: String? = null, notice: String? = null, lastMessage: ChatMessageInfoBo? = null
+            avatar: String? = null, notice: String? = null, lastMessage: ChatMessageInfoBo? = null,
+            lastTimeline: Int = -1
     ) {
         this.groupId = groupId
         this.name = name
@@ -37,6 +40,7 @@ class ChatGroupBo : IBo<TableChatGroup> {
         this.avatar = avatar
         this.notice = notice
         this.lastMessage = lastMessage
+        this.lastTimeline = lastTimeline
     }
 
     override fun toTable(): TableChatGroup {
@@ -44,7 +48,8 @@ class ChatGroupBo : IBo<TableChatGroup> {
                 groupId = groupId,
                 name = name,
                 avatar = avatar,
-                notice = notice
+                notice = notice,
+                lastTimeline = lastTimeline
         )
     }
 
@@ -55,20 +60,10 @@ class ChatGroupBo : IBo<TableChatGroup> {
                     name = table.name,
                     createTime = table.gmtCreate,
                     avatar = table.avatar,
-                    notice = table.notice
+                    notice = table.notice,
+                    lastTimeline = table.lastTimeline
             )
         }
     }
 
-    companion object {
-        fun getVo(table: TableChatGroup): ChatGroupBo {
-            return ChatGroupBo(
-                    groupId = table.groupId,
-                    name = table.name,
-                    createTime = table.gmtCreate,
-                    avatar = table.avatar,
-                    notice = table.notice
-            )
-        }
-    }
 }

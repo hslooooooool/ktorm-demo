@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.dsl.insertAndGenerateKey
+import me.liuwj.ktorm.schema.boolean
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.varchar
 import vip.qsos.ktorm.module.AbsTable
@@ -26,6 +27,7 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
     val sessionId by int("session_id")
     val sequence by int("sequence")
     val content by varchar("content")
+    val cancelBack by boolean("cancel_back")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatMessage {
         return TableChatMessage(
@@ -44,6 +46,7 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
             it.sessionId to t.sessionId
             it.sequence to t.sequence
             it.content to t.content
+            it.cancelBack to t.cancelBack
             it.gmtCreate to t.gmtCreate
             it.gmtUpdate to t.gmtUpdate
             it.deleted to t.deleted
@@ -62,16 +65,20 @@ class TableChatMessage : AbsTable {
 
     @Column(name = "sequence")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(name = "sequence", value = "消息顺序", dataType = "Int")
+    @ApiModelProperty(name = "sequence", value = "消息顺序")
     var sequence: Int = -1
 
     @Column(name = "session_id")
-    @ApiModelProperty(name = "sessionId", value = "会话ID", dataType = "Int")
+    @ApiModelProperty(name = "sessionId", value = "会话ID")
     var sessionId: Int = -1
 
     @Column(name = "content")
-    @ApiModelProperty(name = "content", value = "聊天消息内容", dataType = "String")
+    @ApiModelProperty(name = "content", value = "聊天消息内容")
     var content: String = ""
+
+    @Column(name = "cancel_back")
+    @ApiModelProperty(name = "cancelBack", value = "是否撤回")
+    var cancelBack: Boolean = false
 
     constructor()
     constructor(
@@ -79,6 +86,7 @@ class TableChatMessage : AbsTable {
             sessionId: Int,
             sequence: Int,
             content: String,
+            cancelBack: Boolean = false,
 
             gmtCreate: LocalDateTime = LocalDateTime.now(),
             gmtUpdate: LocalDateTime = LocalDateTime.now(),
@@ -88,6 +96,7 @@ class TableChatMessage : AbsTable {
         this.sessionId = sessionId
         this.sequence = sequence
         this.content = content
+        this.cancelBack = cancelBack
 
         this.gmtCreate = gmtCreate
         this.gmtUpdate = gmtUpdate

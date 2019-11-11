@@ -49,7 +49,8 @@ class ChatSessionService(
                 groupId = sessionId,
                 name = "$createTime【群】",
                 notice = "",
-                avatar = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png"
+                avatar = "http://www.qsos.vip/upload/2018/11/ic_launcher20181225044818498.png",
+                lastTimeline = -1
         ))
 
         data.userIdList.forEach { uId ->

@@ -24,6 +24,7 @@ object DBChatGroup : MBaseTable<TableChatGroup>(TAB_NAME) {
     val avatar by varchar("avatar")
     val notice by varchar("notice")
     val lastMessageId by int("last_message_id")
+    val lastTimeline by int("last_timeline")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatGroup {
         return TableChatGroup(
@@ -32,6 +33,7 @@ object DBChatGroup : MBaseTable<TableChatGroup>(TAB_NAME) {
                 avatar = row[avatar]!!,
                 notice = row[notice],
                 lastMessageId = row[lastMessageId],
+                lastTimeline = row[lastTimeline]!!,
                 gmtCreate = row[gmtCreate]!!,
                 gmtUpdate = row[gmtUpdate]!!,
                 deleted = row[deleted]!!
@@ -45,6 +47,7 @@ object DBChatGroup : MBaseTable<TableChatGroup>(TAB_NAME) {
             it.avatar to t.avatar
             it.notice to t.notice
             it.lastMessageId to t.lastMessageId
+            it.lastTimeline to t.lastTimeline
             it.gmtCreate to t.gmtCreate
             it.gmtUpdate to t.gmtUpdate
             it.deleted to t.deleted
@@ -80,6 +83,9 @@ class TableChatGroup : AbsTable {
     @Column(name = "last_message_id")
     var lastMessageId: Int? = null
 
+    @Column(name = "last_timeline")
+    var lastTimeline: Int = -1
+
     constructor()
     constructor(
             groupId: Int,
@@ -87,6 +93,7 @@ class TableChatGroup : AbsTable {
             avatar: String? = null,
             notice: String?,
             lastMessageId: Int? = null,
+            lastTimeline: Int,
 
             gmtCreate: LocalDateTime = LocalDateTime.now(),
             gmtUpdate: LocalDateTime = LocalDateTime.now(),
@@ -97,6 +104,7 @@ class TableChatGroup : AbsTable {
         this.avatar = avatar
         this.notice = notice
         this.lastMessageId = lastMessageId
+        this.lastTimeline = lastTimeline
 
         this.gmtCreate = gmtCreate
         this.gmtUpdate = gmtUpdate

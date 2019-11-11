@@ -107,6 +107,12 @@ interface IChatService {
          * */
         fun getMessageListBySessionId(sessionId: Int): List<ChatMessageInfoBo>
 
+        /**获取会话下的消息列表，时序以后
+         * @param sessionId 会话ID
+         * @return 会话下的消息列表
+         * */
+        fun getMessageListBySessionIdAndTimeline(sessionId: Int, timeline: Int): List<ChatMessageInfoBo>
+
         /**获取用户发送的消息
          * @param userId 用户ID
          * @return 用户发送的消息
@@ -151,6 +157,13 @@ interface IChatService {
          * @return 已更新的聊天群数据
          * */
         fun updateGroupName(name: String): ChatGroupBo
+
+        /**更新群最后一条消息
+         * @param sessionId 会话ID
+         * @param lastMessageId 最后一条消息ID
+         * @param lastTimeline 最后一条消息的时间线
+         * */
+        fun updateGroupLastTimeline(userId: Int, sessionId: Int, lastMessageId: Int, lastTimeline: Int): ChatGroupBo
 
     }
 }

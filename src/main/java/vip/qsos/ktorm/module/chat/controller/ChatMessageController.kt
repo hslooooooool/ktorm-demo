@@ -27,6 +27,11 @@ open class ChatMessageController @Autowired constructor(
         return MResult<List<ChatMessageInfoBo>>().result(result)
     }
 
+    override fun getMessageListBySessionIdAndTimeline(sessionId: Int, timeline: Int): MResult<List<ChatMessageInfoBo>> {
+        val result = mChatMessageService.getMessageListBySessionIdAndTimeline(sessionId, timeline)
+        return MResult<List<ChatMessageInfoBo>>().result(result)
+    }
+
     override fun getMessageListByUserId(userId: Int): MResult<List<ChatMessageInfoBo>> {
         val result = mChatMessageService.getMessageListByUserId(userId)
         return MResult<List<ChatMessageInfoBo>>().result(result)

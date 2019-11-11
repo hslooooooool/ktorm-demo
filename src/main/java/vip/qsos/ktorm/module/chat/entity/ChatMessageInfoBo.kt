@@ -48,7 +48,7 @@ class ChatMessageBo : IBo<TableChatMessage> {
         }
     }
 
-    fun contentToJson(): String {
+    private fun contentToJson(): String {
         return Gson().toJson(content)
     }
 

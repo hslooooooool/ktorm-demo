@@ -1,19 +1,20 @@
 package vip.qsos.ktorm.module.chat.service
 
-import me.liuwj.ktorm.dsl.delete
-import me.liuwj.ktorm.dsl.eq
-import me.liuwj.ktorm.dsl.update
+import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.findById
 import me.liuwj.ktorm.entity.findList
 import me.liuwj.ktorm.entity.findListByIds
 import me.liuwj.ktorm.entity.findOne
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.util.DateUtils
 
 @Service
-class ChatMessageService : IChatService.IMessage {
+class ChatMessageService @Autowired constructor(
+        private val mChatGroupService: IChatService.IGroup
+) : IChatService.IMessage {
 
     override fun getMessageById(messageId: Int): ChatMessageBo {
         return ChatMessageBo().getBo(DBChatMessage.findById(messageId)) as ChatMessageBo?
@@ -31,21 +32,50 @@ class ChatMessageService : IChatService.IMessage {
         DBChatMessage.findList {
             it.sessionId eq sessionId
         }.map { msg ->
-            DBChatUserWithMessage.findOne {
-                it.messageId eq msg.messageId
-            }?.let { v ->
-                val createTime = DateUtils.format(v.gmtCreate)
-                val message = ChatMessageBo().getBo(msg) as ChatMessageBo
-                DBChatUser.findOne {
-                    it.userId eq v.userId
-                }?.let {
-                    ChatUserBo(
-                            userId = it.userId, userName = it.userName, avatar = it.avatar,
-                            birth = it.birth, sexuality = it.sexuality
-                    )
-                }?.let { user ->
-                    list.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime))
-                }
+            getDBChatUserWithMessage(msg, list)
+        }
+        return list
+    }
+
+    override fun getMessageListBySessionIdAndTimeline(sessionId: Int, timeline: Int): List<ChatMessageInfoBo> {
+        val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
+        DBChatMessage.findList {
+            it.sessionId eq sessionId
+        }
+        DBChatMessage.select().where {
+            DBChatMessage.sessionId eq sessionId
+        }.having {
+            DBChatMessage.sequence greater timeline
+        }.map { row ->
+            val msg = TableChatMessage(
+                    messageId = row[DBChatMessage.messageId]!!,
+                    sessionId = row[DBChatMessage.sessionId] ?: -1,
+                    sequence = row[DBChatMessage.sequence] ?: -1,
+                    content = row[DBChatMessage.content] ?: "",
+                    gmtCreate = row[DBChatMessage.gmtCreate]!!,
+                    gmtUpdate = row[DBChatMessage.gmtUpdate]!!,
+                    deleted = row[DBChatMessage.deleted]!!
+            )
+            getDBChatUserWithMessage(msg, list)
+        }
+        return list
+    }
+
+    private fun getDBChatUserWithMessage(msg: TableChatMessage, list: ArrayList<ChatMessageInfoBo>): ArrayList<ChatMessageInfoBo> {
+        DBChatUserWithMessage.findOne {
+            it.messageId eq msg.messageId
+        }?.let { v ->
+            val createTime = DateUtils.format(v.gmtCreate)
+            val message = ChatMessageBo().getBo(msg) as ChatMessageBo
+            DBChatUser.findOne {
+                it.userId eq v.userId
+            }?.let {
+                ChatUserBo(
+                        userId = it.userId, userName = it.userName, avatar = it.avatar,
+                        birth = it.birth, sexuality = it.sexuality
+                )
+            }?.let { user ->
+                list.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime))
             }
         }
         list.sortByDescending {
@@ -75,33 +105,29 @@ class ChatMessageService : IChatService.IMessage {
         if (message.sessionId < 0) {
             throw BaseException("会话不存在，发送失败")
         }
-        if (message.messageId < 0) {
-            // 插入
-            val mId = DBChatMessage.add(message.toTable())
-            message.messageId = mId as Int
-
-            DBChatUserWithMessage.add(TableChatUserWithMessage(
-                    userId = userId,
-                    messageId = mId
-            ))
-
-            DBChatGroup.update {
-                it.lastMessageId to mId
-
-                where {
-                    it.groupId eq message.sessionId
-                }
-            }
-        } else {
+        val group = mChatGroupService.getGroupById(message.sessionId)
+        val lastTimeline = group.lastTimeline + 1
+        if (message.messageId > 0) {
             // 更新
             DBChatMessage.update {
-                it.content to message.contentToJson()
+                it.cancelBack to true
 
                 where {
                     it.messageId eq message.messageId
                 }
             }
         }
+        // 插入
+        message.messageId = -1
+        message.sequence = lastTimeline
+        val mId = DBChatMessage.add(message.toTable()) as Int
+        message.messageId = mId
+
+        DBChatUserWithMessage.add(TableChatUserWithMessage(
+                userId = userId,
+                messageId = mId
+        ))
+        mChatGroupService.updateGroupLastTimeline(userId, message.sessionId, mId, lastTimeline)
         return message
     }
 

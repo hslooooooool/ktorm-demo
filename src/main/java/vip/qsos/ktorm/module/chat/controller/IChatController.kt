@@ -154,6 +154,17 @@ interface IChatController {
                 sessionId: Int
         ): MResult<List<ChatMessageInfoBo>>
 
+        @GetMapping("/getMessageListBySessionIdAndTimeline")
+        @ApiOperation(value = "获取会话下的消息列表")
+        fun getMessageListBySessionIdAndTimeline(
+                @RequestParam
+                @ApiParam(value = "会话ID", required = true)
+                sessionId: Int,
+                @RequestParam
+                @ApiParam(value = "时序", required = true)
+                timeline: Int
+        ): MResult<List<ChatMessageInfoBo>>
+
         @GetMapping("/getMessageListByUserId")
         @ApiOperation(value = "获取用户发送的消息")
         fun getMessageListByUserId(
