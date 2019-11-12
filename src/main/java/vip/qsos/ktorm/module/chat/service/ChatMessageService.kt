@@ -78,7 +78,7 @@ class ChatMessageService @Autowired constructor(
                 list.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime))
             }
         }
-        list.sortByDescending {
+        list.sortBy {
             it.message.sequence
         }
         return list
