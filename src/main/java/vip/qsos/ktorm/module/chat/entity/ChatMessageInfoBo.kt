@@ -16,15 +16,18 @@ class ChatMessageBo : IBo<TableChatMessage> {
     var sequence: Int = -1
     @ApiModelProperty(value = "消息内容", required = true)
     var content: ChatContentBo = ChatContentBo()
+    @ApiModelProperty(value = "是否撤回", required = true)
+    var cancelBack: Boolean = false
 
     constructor()
     constructor(
             sessionId: Int = -1, messageId: Int = -1,
-            sequence: Int = -1, content: ChatContentBo
+            sequence: Int = -1, cancelBack: Boolean = false, content: ChatContentBo
     ) {
         this.sessionId = sessionId
         this.messageId = messageId
         this.sequence = sequence
+        this.cancelBack = cancelBack
         this.content = content
     }
 
@@ -33,6 +36,7 @@ class ChatMessageBo : IBo<TableChatMessage> {
                 messageId,
                 sessionId,
                 sequence,
+                cancelBack,
                 contentToJson()
         )
     }
@@ -43,6 +47,7 @@ class ChatMessageBo : IBo<TableChatMessage> {
                     table.sessionId,
                     table.messageId,
                     table.sequence,
+                    table.cancelBack,
                     jsonToContent(table.content)
             )
         }

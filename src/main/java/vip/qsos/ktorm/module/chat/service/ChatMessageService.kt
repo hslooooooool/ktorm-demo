@@ -7,13 +7,17 @@ import me.liuwj.ktorm.entity.findListByIds
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import vip.qsos.ktorm.config.ChatMessageProperties
 import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.util.DateUtils
+import java.time.Duration
+import java.time.LocalDateTime
 
 @Service
 class ChatMessageService @Autowired constructor(
-        private val mChatGroupService: IChatService.IGroup
+        private val mChatGroupService: IChatService.IGroup,
+        private val mChatMessageProperties: ChatMessageProperties
 ) : IChatService.IMessage {
 
     override fun getMessageById(messageId: Int): ChatMessageBo {
@@ -31,6 +35,7 @@ class ChatMessageService @Autowired constructor(
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
         DBChatMessage.findList {
             it.sessionId eq sessionId
+            it.cancelBack eq false
         }.map { msg ->
             getDBChatUserWithMessage(msg, list)
         }
@@ -132,10 +137,21 @@ class ChatMessageService @Autowired constructor(
     }
 
     override fun deleteMessage(messageId: Int): Boolean {
-        val result = DBChatMessage.delete {
-            it.messageId eq messageId
+        val msg = DBChatMessage.findById(messageId)
+        return when {
+            msg == null -> false
+            Duration.between(msg.gmtCreate, LocalDateTime.now())
+                    .seconds > mChatMessageProperties.cancellimit -> false
+            else -> {
+                val result = DBChatMessage.update {
+                    it.cancelBack to true
+                    where {
+                        it.messageId eq messageId
+                    }
+                }
+                result == 1
+            }
         }
-        return result == 1
     }
 
 }

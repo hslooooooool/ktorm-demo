@@ -173,7 +173,7 @@ interface IChatController {
                 userId: Int
         ): MResult<List<ChatMessageInfoBo>>
 
-        @DeleteMapping
+        @DeleteMapping("/deleteMessage")
         @ApiOperation(value = "删除(撤销)消息")
         fun deleteMessage(
                 @RequestParam

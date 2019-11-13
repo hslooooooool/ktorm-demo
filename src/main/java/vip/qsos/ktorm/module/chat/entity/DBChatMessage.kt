@@ -85,8 +85,8 @@ class TableChatMessage : AbsTable {
             messageId: Int,
             sessionId: Int,
             sequence: Int,
-            content: String,
             cancelBack: Boolean = false,
+            content: String,
 
             gmtCreate: LocalDateTime = LocalDateTime.now(),
             gmtUpdate: LocalDateTime = LocalDateTime.now(),
