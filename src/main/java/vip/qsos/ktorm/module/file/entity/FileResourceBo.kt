@@ -32,7 +32,7 @@ class FileResourceBo : IBo<TableFileResource> {
         return table?.let {
             FileResourceBo(
                     // FIXME 配置访问HOST
-                    url = "http://192.168.0.103:8085/" + table.url,
+                    url = "http://192.168.1.14:8085/" + table.url,
                     filename = table.filename,
                     type = table.type
             )
