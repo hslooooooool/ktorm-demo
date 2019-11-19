@@ -34,6 +34,7 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
                 messageId = row[messageId]!!,
                 sessionId = row[sessionId] ?: -1,
                 sequence = row[sequence] ?: -1,
+                cancelBack = row[cancelBack]!!,
                 content = row[content] ?: "",
                 gmtCreate = row[gmtCreate]!!,
                 gmtUpdate = row[gmtUpdate]!!,

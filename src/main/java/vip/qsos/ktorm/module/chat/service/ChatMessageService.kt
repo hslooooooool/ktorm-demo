@@ -33,11 +33,12 @@ class ChatMessageService @Autowired constructor(
 
     override fun getMessageListBySessionId(sessionId: Int): List<ChatMessageInfoBo> {
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
-        DBChatMessage.findList {
-            (it.sessionId eq sessionId) and (it.cancelBack eq false)
-        }.map { msg ->
-            getDBChatUserWithMessage(msg, list)
-        }
+        DBChatMessage.select()
+                .where {
+                    (DBChatMessage.sessionId eq sessionId) and (DBChatMessage.cancelBack eq false)
+                }.map {
+                    getDBChatUserWithMessage(DBChatMessage.createEntity(it), list)
+                }
         return list
     }
 

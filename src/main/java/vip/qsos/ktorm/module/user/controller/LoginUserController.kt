@@ -14,9 +14,11 @@ import vip.qsos.ktorm.util.MResult
 class LoginUserController : ILoginUserModel {
 
     override fun login(account: String, password: String): MResult<LoginUserBo> {
-        val user = LoginUserBo().getBo(DBLoginUser.findOne {
-            (it.account eq account) and (it.password eq password)
-        }) as LoginUserBo?
+        val user = LoginUserBo().getBo(
+                DBLoginUser.findOne {
+                    (it.account eq account) and (it.password eq password)
+                }
+        ) as LoginUserBo?
         return if (user == null) {
             MResult<LoginUserBo>().error("账号或密码错误")
         } else {

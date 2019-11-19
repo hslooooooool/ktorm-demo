@@ -1,6 +1,5 @@
 package vip.qsos.ktorm.module.chat.service
 
-import me.liuwj.ktorm.dsl.and
 import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.dsl.update
 import me.liuwj.ktorm.entity.findById
@@ -25,9 +24,11 @@ open class ChatGroupService : IChatService.IGroup {
             val chatGroup = ChatGroupBo().getBo(group) as ChatGroupBo
 
             val message = group.lastMessageId?.let { messageId ->
-                ChatMessageBo().getBo(DBChatMessage.findOne {
-                    (it.messageId eq messageId) and (it.cancelBack eq false)
-                }) as ChatMessageBo?
+                ChatMessageBo().getBo(
+                        DBChatMessage.findById(messageId)?.let {
+                            if (it.cancelBack) null else it
+                        }
+                ) as ChatMessageBo?
             }
             message?.let {
                 val chatUserWithMessage = DBChatUserWithMessage.findOne {
