@@ -66,7 +66,9 @@ open class FileIOServiceImpl @Autowired constructor(
             }
             val fileInfo = getUUIDFileName(file)
             val uuidFileName = fileInfo[0] + fileInfo[1]
-            val originalUrl = "$folderPath/$uuidFileName"
+            val uuidFileNameOfMin = "min-$uuidFileName"
+            val originalUrlOfMin = "$folderPath$uuidFileNameOfMin"
+            var originalUrl = "$folderPath$uuidFileName"
 
             inputStream = file.inputStream
             outputStream = FileOutputStream(originalUrl)
@@ -83,15 +85,15 @@ open class FileIOServiceImpl @Autowired constructor(
             when (fileInfo[1].toLowerCase()) {
                 ".jpg", ".jpeg", ".png" -> {
                     // 如果是图片，保存一份缩略图，名称后加‘-min’即可访问
-                    val changUrl = "$folderPath/" + fileInfo[0] + "-min" + fileInfo[1]
-                    changPicture(originalUrl, changUrl)
+                    changPicture(originalUrl, originalUrlOfMin)
+                    originalUrl = originalUrlOfMin
                 }
                 else -> {
                 }
             }
 
             fileList.add(FileResourceBo(
-                    url = "${mProperties.location}/$dateFolder/$uuidFileName",
+                    url = originalUrl,
                     filename = uuidFileName,
                     type = fileInfo[1]
             ))
