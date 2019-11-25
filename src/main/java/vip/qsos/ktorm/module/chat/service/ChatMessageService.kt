@@ -50,12 +50,12 @@ class ChatMessageService @Autowired constructor(
         DBChatMessage.select().where {
             DBChatMessage.sessionId eq sessionId
         }.having {
-            DBChatMessage.sequence greater timeline
+            DBChatMessage.timeline greater timeline
         }.map { row ->
             val msg = TableChatMessage(
                     messageId = row[DBChatMessage.messageId]!!,
                     sessionId = row[DBChatMessage.sessionId] ?: -1,
-                    sequence = row[DBChatMessage.sequence] ?: -1,
+                    timeline = row[DBChatMessage.timeline]!!,
                     content = row[DBChatMessage.content] ?: "",
                     gmtCreate = row[DBChatMessage.gmtCreate]!!,
                     gmtUpdate = row[DBChatMessage.gmtUpdate]!!,
@@ -84,7 +84,7 @@ class ChatMessageService @Autowired constructor(
             }
         }
         list.sortBy {
-            it.message.sequence
+            it.message.timeline
         }
         return list
     }
@@ -101,7 +101,7 @@ class ChatMessageService @Autowired constructor(
             messages.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime))
         }
         messages.sortByDescending {
-            it.message.sequence
+            it.message.timeline
         }
         return messages
     }
@@ -111,7 +111,7 @@ class ChatMessageService @Autowired constructor(
             throw BaseException("会话不存在，发送失败")
         }
         val group = mChatGroupService.getGroupById(message.sessionId)
-        val lastTimeline = group.lastTimeline + 1
+        val lastTimeline = (if (group.lastTimeline < 0) 0 else group.lastTimeline) + 1
         if (message.messageId > 0) {
             // 更新
             DBChatMessage.update {
@@ -124,7 +124,7 @@ class ChatMessageService @Autowired constructor(
         }
         // 插入
         message.messageId = -1
-        message.sequence = lastTimeline
+        message.timeline = lastTimeline
         val mId = DBChatMessage.add(message.toTable()) as Int
         message.messageId = mId
 

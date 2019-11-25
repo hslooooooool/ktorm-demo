@@ -188,7 +188,7 @@ interface IChatController {
     @RequestMapping("/chat/group")
     interface IGroup {
 
-        @GetMapping
+        @GetMapping("/getGroupById")
         @ApiOperation(value = "获取群信息")
         fun getGroupById(
                 @RequestParam

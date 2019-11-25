@@ -25,7 +25,7 @@ private const val TAB_NAME = "t_chat_message"
 object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
     val messageId by int("id").primaryKey()
     val sessionId by int("session_id")
-    val sequence by int("sequence")
+    val timeline by int("timeline")
     val content by varchar("content")
     val cancelBack by boolean("cancel_back")
 
@@ -33,7 +33,7 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
         return TableChatMessage(
                 messageId = row[messageId]!!,
                 sessionId = row[sessionId] ?: -1,
-                sequence = row[sequence] ?: -1,
+                timeline = row[timeline] ?: -1,
                 cancelBack = row[cancelBack]!!,
                 content = row[content] ?: "",
                 gmtCreate = row[gmtCreate]!!,
@@ -45,7 +45,7 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
     override fun add(t: TableChatMessage): Any {
         return this.insertAndGenerateKey {
             it.sessionId to t.sessionId
-            it.sequence to t.sequence
+            it.timeline to t.timeline
             it.content to t.content
             it.cancelBack to t.cancelBack
             it.gmtCreate to t.gmtCreate
@@ -64,10 +64,10 @@ class TableChatMessage : AbsTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var messageId: Int = -1
 
-    @Column(name = "sequence")
+    @Column(name = "timeline")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(name = "sequence", value = "消息顺序")
-    var sequence: Int = -1
+    @ApiModelProperty(name = "timeline", value = "消息时序")
+    var timeline: Int = -1
 
     @Column(name = "session_id")
     @ApiModelProperty(name = "sessionId", value = "会话ID")
@@ -85,7 +85,7 @@ class TableChatMessage : AbsTable {
     constructor(
             messageId: Int,
             sessionId: Int,
-            sequence: Int,
+            timeline: Int,
             cancelBack: Boolean = false,
             content: String,
 
@@ -95,7 +95,7 @@ class TableChatMessage : AbsTable {
     ) {
         this.messageId = messageId
         this.sessionId = sessionId
-        this.sequence = sequence
+        this.timeline = timeline
         this.content = content
         this.cancelBack = cancelBack
 
