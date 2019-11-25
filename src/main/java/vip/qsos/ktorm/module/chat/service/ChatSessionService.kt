@@ -3,6 +3,7 @@ package vip.qsos.ktorm.module.chat.service
 import me.liuwj.ktorm.dsl.delete
 import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.entity.findById
+import me.liuwj.ktorm.entity.findList
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -72,7 +73,6 @@ class ChatSessionService(
         userIdList.sorted().forEach {
             hashCode += it.toString()
         }
-        hashCode = hashCode.hashCode().toString()
         return DBChatSession.findOne {
             it.hashCode eq hashCode
         }?.let {
@@ -81,13 +81,30 @@ class ChatSessionService(
     }
 
     override fun addUserListToSession(userId: Int, userIdList: List<Int>, sessionId: Int): ChatSessionBo {
-        val session = ChatSessionBo().getBo(DBChatSession.findById(sessionId)) as ChatSessionBo?
+        var session = ChatSessionBo().getBo(DBChatSession.findById(sessionId)) as ChatSessionBo?
                 ?: throw BaseException("无法找到")
-        userIdList.forEach { uId ->
-            DBChatUserWithSession.add(TableChatUserWithSession(
-                    userId = uId,
-                    sessionId = sessionId
+        val userIds = hashSetOf<Int>()
+        DBChatUserWithSession.findList {
+            it.sessionId eq sessionId
+        }.map {
+            userIds.add(it.userId)
+        }
+        if (session.type == ChatSessionType.SINGLE) {
+            // 此前为单聊，添加新人表示创建群聊
+            userIds.addAll(userIdList)
+            session = createSession(userId, FormCreateSession(
+                    userIdList = userIds.toList()
             ))
+        } else {
+            // 此前为群聊，判断用户是否已加入，没有则加入
+            userIdList.forEach { uId ->
+                if (!userIds.contains(uId)) {
+                    DBChatUserWithSession.add(TableChatUserWithSession(
+                            userId = uId,
+                            sessionId = sessionId
+                    ))
+                }
+            }
         }
         return session
     }
