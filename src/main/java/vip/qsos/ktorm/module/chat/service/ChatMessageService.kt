@@ -130,14 +130,14 @@ class ChatMessageService @Autowired constructor(
         return result == 1
     }
 
-    override fun getMessageReadStatus(userId: Int, messageId: Int): IChatService.IMessage.MessageReadStatus {
+    override fun getMessageReadStatus(userId: Int, messageId: Int): ChatMessageReadStatusBo {
         val read = DBChatMessageReadStatus.findById(messageId)
                 ?: throw BaseException("消息读取记录不存在")
         val readStatus = read.readIds.contains("$userId")
         val readNum = read.readIds.split("_").filter {
             it != ""
         }.size
-        return IChatService.IMessage.MessageReadStatus(readStatus, readNum)
+        return ChatMessageReadStatusBo(readStatus, readNum)
     }
 
     override fun sendMessage(userId: Int, message: ChatMessageBo): ChatMessageBo {
@@ -169,12 +169,13 @@ class ChatMessageService @Autowired constructor(
         return message
     }
 
-    override fun readMessage(userId: Int, messageId: Int): Boolean {
+    override fun readMessage(userId: Int, messageId: Int): ChatMessageReadStatusBo {
         var result = 1
         val read = DBChatMessageReadStatus.findById(messageId)
                 ?: throw BaseException("消息读取记录不存在")
+        var readIds = read.readIds
         if (!read.readIds.contains("$userId")) {
-            val readIds = read.readIds + "_$userId"
+            readIds += "_$userId"
             result = DBChatMessageReadStatus.update {
                 it.readIds to readIds
                 where {
@@ -182,7 +183,10 @@ class ChatMessageService @Autowired constructor(
                 }
             }
         }
-        return result == 1
+        val readNum = readIds.split("_").filter {
+            it != ""
+        }.size
+        return ChatMessageReadStatusBo(result == 1, readNum)
     }
 
     override fun deleteMessage(userId: Int, messageId: Int): Boolean {

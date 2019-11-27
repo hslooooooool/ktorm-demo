@@ -141,19 +141,13 @@ interface IChatService {
          * @param messageId 消息ID
          * @return 已读状态
          * */
-        fun getMessageReadStatus(userId: Int, messageId: Int): MessageReadStatus
-
-        /**消息已读记录
-         * @param readStatus 当前用户是否已读
-         * @param readNum 消息被多少人读取
-         * */
-        data class MessageReadStatus(val readStatus: Boolean, val readNum: Int)
+        fun getMessageReadStatus(userId: Int, messageId: Int): ChatMessageReadStatusBo
 
         /**更新消息已读状态
          * @param userId 登录用户ID
          * @param messageId 已读消息ID
          * */
-        fun readMessage(userId: Int, messageId: Int): Boolean
+        fun readMessage(userId: Int, messageId: Int): ChatMessageReadStatusBo
 
         /**撤回消息
          * @param userId 登录用户ID

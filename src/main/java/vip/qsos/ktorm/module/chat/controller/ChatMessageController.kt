@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
 import vip.qsos.ktorm.module.chat.entity.ChatMessageBo
 import vip.qsos.ktorm.module.chat.entity.ChatMessageInfoBo
+import vip.qsos.ktorm.module.chat.entity.ChatMessageReadStatusBo
 import vip.qsos.ktorm.module.chat.service.IChatService
 import vip.qsos.ktorm.util.MResult
 
@@ -42,10 +43,10 @@ open class ChatMessageController @Autowired constructor(
         return MResult<ChatMessageBo>().result(result)
     }
 
-    override fun readMessage(userId: Int, messageId: Int): MResult<Boolean> {
+    override fun readMessage(userId: Int, messageId: Int): MResult<ChatMessageReadStatusBo> {
         val result = mChatMessageService.readMessage(userId, messageId)
-        // TODO if result = true , pushMessageWithReadNum to everyone
-        return MResult<Boolean>().result(result)
+        // TODO if result.readState = true , pushMessage(result) to all
+        return MResult<ChatMessageReadStatusBo>().result(result)
     }
 
     override fun deleteMessage(userId: Int, messageId: Int): MResult<Boolean> {
