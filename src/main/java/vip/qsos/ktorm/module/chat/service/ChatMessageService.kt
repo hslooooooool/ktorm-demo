@@ -134,7 +134,9 @@ class ChatMessageService @Autowired constructor(
         val read = DBChatMessageReadStatus.findById(messageId)
                 ?: throw BaseException("消息读取记录不存在")
         val readStatus = read.readIds.contains("$userId")
-        val readNum = read.readIds.split("_").size
+        val readNum = read.readIds.split("_").filter {
+            it != ""
+        }.size
         return IChatService.IMessage.MessageReadStatus(readStatus, readNum)
     }
 
