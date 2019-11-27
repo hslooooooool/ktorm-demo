@@ -3,7 +3,7 @@ package vip.qsos.ktorm.module.chat.entity
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import me.liuwj.ktorm.dsl.QueryRowSet
-import me.liuwj.ktorm.dsl.insertAndGenerateKey
+import me.liuwj.ktorm.dsl.insert
 import me.liuwj.ktorm.schema.int
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
@@ -37,7 +37,7 @@ object DBChatUserWithMessage : MBaseTable<TableChatUserWithMessage>(TAB_NAME) {
     }
 
     override fun add(t: TableChatUserWithMessage): Any {
-        return this.insertAndGenerateKey {
+        return this.insert {
             it.userId to t.userId
             it.messageId to t.messageId
             it.gmtCreate to t.gmtCreate

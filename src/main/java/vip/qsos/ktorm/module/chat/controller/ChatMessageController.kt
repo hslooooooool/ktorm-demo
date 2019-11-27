@@ -42,6 +42,12 @@ open class ChatMessageController @Autowired constructor(
         return MResult<ChatMessageBo>().result(result)
     }
 
+    override fun readMessage(userId: Int, messageId: Int): MResult<Boolean> {
+        val result = mChatMessageService.readMessage(userId, messageId)
+        // TODO if result = true , pushMessageWithReadNum to everyone
+        return MResult<Boolean>().result(result)
+    }
+
     override fun deleteMessage(userId: Int, messageId: Int): MResult<Boolean> {
         val result = mChatMessageService.deleteMessage(userId, messageId)
         return MResult<Boolean>().result(result)

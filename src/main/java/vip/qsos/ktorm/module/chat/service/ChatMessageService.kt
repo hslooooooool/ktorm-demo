@@ -80,8 +80,11 @@ class ChatMessageService @Autowired constructor(
                         birth = it.birth, sexuality = it.sexuality
                 )
             }?.let { user ->
-                val read = getMessageReadState(userId, msg.messageId)
-                list.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime, readStatus = read))
+                val read = getMessageReadStatus(userId, msg.messageId)
+                list.add(ChatMessageInfoBo(
+                        user = user, message = message, createTime = createTime,
+                        readNum = read.readNum, readStatus = read.readStatus
+                ))
             }
         }
         list.sortBy {
@@ -99,8 +102,11 @@ class ChatMessageService @Autowired constructor(
             val createTime = DateUtils.format(it.gmtCreate)
             val user = ChatUserBo().getBo(DBChatUser.findById(it.userId)) as ChatUserBo
             val message = ChatMessageBo().getBo(DBChatMessage.findById(it.messageId)) as ChatMessageBo
-            val read = getMessageReadState(userId, it.messageId)
-            messages.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime, readStatus = read))
+            val read = getMessageReadStatus(userId, it.messageId)
+            messages.add(ChatMessageInfoBo(
+                    user = user, message = message, createTime = createTime,
+                    readNum = read.readNum, readStatus = read.readStatus)
+            )
         }
         messages.sortByDescending {
             it.message.timeline
@@ -108,31 +114,28 @@ class ChatMessageService @Autowired constructor(
         return messages
     }
 
-    override fun addMessageReadState(userId: Int, messageId: Int): Boolean {
-        val result = DBChatMessageReadState.add(TableChatMessageReadState(
-                messageId = messageId,
-                readIds = "-$userId"
+    override fun addUserWithMessage(userId: Int, messageId: Int): Boolean {
+        val result = DBChatUserWithMessage.add(TableChatUserWithMessage(
+                userId = userId,
+                messageId = messageId
         )) as Int
         return result == 1
     }
 
-    override fun updateMessageReadState(userId: Int, messageId: Int): Boolean {
-        val read = DBChatMessageReadState.findById(messageId) ?: throw BaseException("消息读取记录不存在")
-        val readIds = if (!read.readIds.contains("$userId")) {
-            read.readIds + "-$userId"
-        } else {
-            read.readIds
-        }
-        val result = DBChatMessageReadState.add(TableChatMessageReadState(
+    override fun addMessageReadStatus(userId: Int, messageId: Int): Boolean {
+        val result = DBChatMessageReadStatus.add(TableChatMessageReadStatus(
                 messageId = messageId,
-                readIds = "-$userId"
+                readIds = "_$userId"
         )) as Int
         return result == 1
     }
 
-    override fun getMessageReadState(userId: Int, messageId: Int): Boolean {
-        val read = DBChatMessageReadState.findById(messageId) ?: throw BaseException("消息读取记录不存在")
-        return read.readIds.contains("$userId")
+    override fun getMessageReadStatus(userId: Int, messageId: Int): IChatService.IMessage.MessageReadStatus {
+        val read = DBChatMessageReadStatus.findById(messageId)
+                ?: throw BaseException("消息读取记录不存在")
+        val readStatus = read.readIds.contains("$userId")
+        val readNum = read.readIds.split("_").size
+        return IChatService.IMessage.MessageReadStatus(readStatus, readNum)
     }
 
     override fun sendMessage(userId: Int, message: ChatMessageBo): ChatMessageBo {
@@ -157,12 +160,27 @@ class ChatMessageService @Autowired constructor(
         val mId = DBChatMessage.add(message.toTable()) as Int
         message.messageId = mId
 
-        DBChatUserWithMessage.add(TableChatUserWithMessage(
-                userId = userId,
-                messageId = mId
-        ))
+        if (!addUserWithMessage(userId, mId)) throw BaseException("消息与用户关系添加失败")
+        if (!addMessageReadStatus(userId, mId)) throw BaseException("消息记录添加失败")
+
         mChatGroupService.updateGroupLastTimeline(userId, message.sessionId, mId, lastTimeline)
         return message
+    }
+
+    override fun readMessage(userId: Int, messageId: Int): Boolean {
+        var result = 1
+        val read = DBChatMessageReadStatus.findById(messageId)
+                ?: throw BaseException("消息读取记录不存在")
+        if (!read.readIds.contains("$userId")) {
+            val readIds = read.readIds + "_$userId"
+            result = DBChatMessageReadStatus.update {
+                it.readIds to readIds
+                where {
+                    it.messageId eq messageId
+                }
+            }
+        }
+        return result == 1
     }
 
     override fun deleteMessage(userId: Int, messageId: Int): Boolean {

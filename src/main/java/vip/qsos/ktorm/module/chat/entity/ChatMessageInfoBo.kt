@@ -71,6 +71,8 @@ data class ChatMessageInfoBo(
         val createTime: String,
         @ApiModelProperty(value = "聊天消息", required = true)
         val message: ChatMessageBo,
+        @ApiModelProperty(value = "聊天消息读取数")
+        var readNum: Int = 1,
         @ApiModelProperty(value = "聊天消息当前用户读取状态")
         var readStatus: Boolean = true
 )

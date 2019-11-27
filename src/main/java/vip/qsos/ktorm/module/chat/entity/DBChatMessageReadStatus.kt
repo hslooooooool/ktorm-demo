@@ -12,18 +12,18 @@ import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Id
 
-private const val TAB_NAME = "t_chat_message_read_state"
+private const val TAB_NAME = "t_chat_message_read_status"
 
 /**
  * @author : 华清松
  * @description : 聊天消息已读记录表
  */
-object DBChatMessageReadState : MBaseTable<TableChatMessageReadState>(TAB_NAME) {
+object DBChatMessageReadStatus : MBaseTable<TableChatMessageReadStatus>(TAB_NAME) {
     val messageId by int("message_id").primaryKey()
     val readIds by text("read_ids")
 
-    override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatMessageReadState {
-        return TableChatMessageReadState(
+    override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatMessageReadStatus {
+        return TableChatMessageReadStatus(
                 messageId = row[messageId]!!,
                 readIds = row[readIds]!!,
 
@@ -33,7 +33,7 @@ object DBChatMessageReadState : MBaseTable<TableChatMessageReadState>(TAB_NAME) 
         )
     }
 
-    override fun add(t: TableChatMessageReadState): Any {
+    override fun add(t: TableChatMessageReadStatus): Any {
         return insert {
             it.messageId to t.messageId
             it.readIds to t.readIds
@@ -48,7 +48,7 @@ object DBChatMessageReadState : MBaseTable<TableChatMessageReadState>(TAB_NAME) 
 @javax.persistence.Entity
 @javax.persistence.Table(name = TAB_NAME)
 @ApiModel(value = "聊天消息已读记录实体")
-class TableChatMessageReadState : AbsTable {
+class TableChatMessageReadStatus : AbsTable {
     @Id
     @Column(name = "message_id")
     @ApiModelProperty(name = "messageId", value = "消息ID")

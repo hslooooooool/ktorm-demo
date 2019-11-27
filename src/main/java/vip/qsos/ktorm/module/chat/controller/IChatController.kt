@@ -185,6 +185,17 @@ interface IChatController {
                 userId: Int
         ): MResult<List<ChatMessageInfoBo>>
 
+        @PostMapping("/readMessage")
+        @ApiOperation(value = "更新消息已读状态")
+        fun readMessage(
+                @RequestHeader
+                @ApiParam(value = "登录用户ID", required = true)
+                userId: Int,
+                @RequestParam
+                @ApiParam(value = "已读消息ID", required = true)
+                messageId: Int
+        ): MResult<Boolean>
+
         @DeleteMapping("/deleteMessage")
         @ApiOperation(value = "删除(撤销)消息")
         fun deleteMessage(

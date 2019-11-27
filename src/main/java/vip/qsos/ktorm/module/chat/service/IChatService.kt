@@ -122,26 +122,38 @@ interface IChatService {
          * */
         fun getMessageListByUserId(userId: Int): List<ChatMessageInfoBo>
 
+        /**添加消息与用户关系
+         * @param userId 登录用户ID
+         * @param messageId 消息ID
+         * @return 添加是否成功
+         * */
+        fun addUserWithMessage(userId: Int, messageId: Int): Boolean
+
         /**添加消息读取状态
          * @param userId 登录用户ID
          * @param messageId 消息ID
          * @return 添加是否成功
          * */
-        fun addMessageReadState(userId: Int, messageId: Int): Boolean
-
-        /**更新消息读取状态
-         * @param userId 登录用户ID
-         * @param messageId 消息ID
-         * @return 更新是否成功
-         * */
-        fun updateMessageReadState(userId: Int, messageId: Int): Boolean
+        fun addMessageReadStatus(userId: Int, messageId: Int): Boolean
 
         /**获取消息读取状态
          * @param userId 登录用户ID
          * @param messageId 消息ID
          * @return 已读状态
          * */
-        fun getMessageReadState(userId: Int, messageId: Int): Boolean
+        fun getMessageReadStatus(userId: Int, messageId: Int): MessageReadStatus
+
+        /**消息已读记录
+         * @param readStatus 当前用户是否已读
+         * @param readNum 消息被多少人读取
+         * */
+        data class MessageReadStatus(val readStatus: Boolean, val readNum: Int)
+
+        /**更新消息已读状态
+         * @param userId 登录用户ID
+         * @param messageId 已读消息ID
+         * */
+        fun readMessage(userId: Int, messageId: Int): Boolean
 
         /**撤回消息
          * @param userId 登录用户ID
