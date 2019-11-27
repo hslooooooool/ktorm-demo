@@ -20,29 +20,29 @@ class ChatMessageService @Autowired constructor(
         private val mChatMessageProperties: ChatMessageProperties
 ) : IChatService.IMessage {
 
-    override fun getMessageById(messageId: Int): ChatMessageBo {
+    override fun getMessageById(userId: Int, messageId: Int): ChatMessageBo {
         return ChatMessageBo().getBo(DBChatMessage.findById(messageId)) as ChatMessageBo?
                 ?: throw BaseException("消息不存在")
     }
 
-    override fun getMessageListByIds(messageIds: List<Int>): List<ChatMessageBo> {
+    override fun getMessageListByIds(userId: Int, messageIds: List<Int>): List<ChatMessageBo> {
         return DBChatMessage.findListByIds(messageIds).map {
             ChatMessageBo().getBo(it) as ChatMessageBo
         }
     }
 
-    override fun getMessageListBySessionId(sessionId: Int): List<ChatMessageInfoBo> {
+    override fun getMessageListBySessionId(userId: Int, sessionId: Int): List<ChatMessageInfoBo> {
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
         DBChatMessage.select()
                 .where {
                     (DBChatMessage.sessionId eq sessionId) and (DBChatMessage.cancelBack eq false)
                 }.map {
-                    getDBChatUserWithMessage(DBChatMessage.createEntity(it), list)
+                    getDBChatUserWithMessage(userId, DBChatMessage.createEntity(it), list)
                 }
         return list
     }
 
-    override fun getMessageListBySessionIdAndTimeline(sessionId: Int, timeline: Int): List<ChatMessageInfoBo> {
+    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int): List<ChatMessageInfoBo> {
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
         DBChatMessage.findList {
             it.sessionId eq sessionId
@@ -61,12 +61,12 @@ class ChatMessageService @Autowired constructor(
                     gmtUpdate = row[DBChatMessage.gmtUpdate]!!,
                     deleted = row[DBChatMessage.deleted]!!
             )
-            getDBChatUserWithMessage(msg, list)
+            getDBChatUserWithMessage(userId, msg, list)
         }
         return list
     }
 
-    private fun getDBChatUserWithMessage(msg: TableChatMessage, list: ArrayList<ChatMessageInfoBo>): ArrayList<ChatMessageInfoBo> {
+    private fun getDBChatUserWithMessage(userId: Int, msg: TableChatMessage, list: ArrayList<ChatMessageInfoBo>): ArrayList<ChatMessageInfoBo> {
         DBChatUserWithMessage.findOne {
             it.messageId eq msg.messageId
         }?.let { v ->
@@ -80,7 +80,8 @@ class ChatMessageService @Autowired constructor(
                         birth = it.birth, sexuality = it.sexuality
                 )
             }?.let { user ->
-                list.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime))
+                val read = getMessageReadState(userId, msg.messageId)
+                list.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime, readStatus = read))
             }
         }
         list.sortBy {
@@ -98,12 +99,40 @@ class ChatMessageService @Autowired constructor(
             val createTime = DateUtils.format(it.gmtCreate)
             val user = ChatUserBo().getBo(DBChatUser.findById(it.userId)) as ChatUserBo
             val message = ChatMessageBo().getBo(DBChatMessage.findById(it.messageId)) as ChatMessageBo
-            messages.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime))
+            val read = getMessageReadState(userId, it.messageId)
+            messages.add(ChatMessageInfoBo(user = user, message = message, createTime = createTime, readStatus = read))
         }
         messages.sortByDescending {
             it.message.timeline
         }
         return messages
+    }
+
+    override fun addMessageReadState(userId: Int, messageId: Int): Boolean {
+        val result = DBChatMessageReadState.add(TableChatMessageReadState(
+                messageId = messageId,
+                readIds = "-$userId"
+        )) as Int
+        return result == 1
+    }
+
+    override fun updateMessageReadState(userId: Int, messageId: Int): Boolean {
+        val read = DBChatMessageReadState.findById(messageId) ?: throw BaseException("消息读取记录不存在")
+        val readIds = if (!read.readIds.contains("$userId")) {
+            read.readIds + "-$userId"
+        } else {
+            read.readIds
+        }
+        val result = DBChatMessageReadState.add(TableChatMessageReadState(
+                messageId = messageId,
+                readIds = "-$userId"
+        )) as Int
+        return result == 1
+    }
+
+    override fun getMessageReadState(userId: Int, messageId: Int): Boolean {
+        val read = DBChatMessageReadState.findById(messageId) ?: throw BaseException("消息读取记录不存在")
+        return read.readIds.contains("$userId")
     }
 
     override fun sendMessage(userId: Int, message: ChatMessageBo): ChatMessageBo {
@@ -136,7 +165,7 @@ class ChatMessageService @Autowired constructor(
         return message
     }
 
-    override fun deleteMessage(messageId: Int): Boolean {
+    override fun deleteMessage(userId: Int, messageId: Int): Boolean {
         val msg = DBChatMessage.findById(messageId)
         return when {
             msg == null -> false

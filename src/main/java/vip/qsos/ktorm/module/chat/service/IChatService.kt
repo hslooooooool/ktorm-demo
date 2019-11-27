@@ -1,6 +1,5 @@
 package vip.qsos.ktorm.module.chat.service
 
-import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.chat.entity.*
 import vip.qsos.ktorm.module.chat.entity.form.FormCreateSession
 import vip.qsos.ktorm.module.chat.entity.form.FormCreateUser
@@ -83,46 +82,72 @@ interface IChatService {
     interface IMessage {
 
         /**发送消息
+         * @param userId 登录用户ID
          * @param message 消息数据
          * @return 消息数据
          * */
         fun sendMessage(userId: Int, message: ChatMessageBo): ChatMessageBo
 
         /**获取消息数据
+         * @param userId 登录用户ID
          * @param messageId 消息ID
          * @return 消息数据
          * */
-        fun getMessageById(messageId: Int): ChatMessageBo
+        fun getMessageById(userId: Int, messageId: Int): ChatMessageBo
 
         /**获取消息列表数据
+         * @param userId 登录用户ID
          * @param messageIds 消息ID集合
          * @return 消息列表数据
          * */
-        @Throws(BaseException::class)
-        fun getMessageListByIds(messageIds: List<Int>): List<ChatMessageBo>
+        fun getMessageListByIds(userId: Int, messageIds: List<Int>): List<ChatMessageBo>
 
         /**获取会话下的消息列表
+         * @param userId 登录用户ID
          * @param sessionId 会话ID
          * @return 会话下的消息列表
          * */
-        fun getMessageListBySessionId(sessionId: Int): List<ChatMessageInfoBo>
+        fun getMessageListBySessionId(userId: Int, sessionId: Int): List<ChatMessageInfoBo>
 
         /**获取会话下的消息列表，时序以后
+         * @param userId 登录用户ID
          * @param sessionId 会话ID
          * @return 会话下的消息列表
          * */
-        fun getMessageListBySessionIdAndTimeline(sessionId: Int, timeline: Int): List<ChatMessageInfoBo>
+        fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int): List<ChatMessageInfoBo>
 
         /**获取用户发送的消息
-         * @param userId 用户ID
+         * @param userId 登录用户ID
          * @return 用户发送的消息
          * */
         fun getMessageListByUserId(userId: Int): List<ChatMessageInfoBo>
 
+        /**添加消息读取状态
+         * @param userId 登录用户ID
+         * @param messageId 消息ID
+         * @return 添加是否成功
+         * */
+        fun addMessageReadState(userId: Int, messageId: Int): Boolean
+
+        /**更新消息读取状态
+         * @param userId 登录用户ID
+         * @param messageId 消息ID
+         * @return 更新是否成功
+         * */
+        fun updateMessageReadState(userId: Int, messageId: Int): Boolean
+
+        /**获取消息读取状态
+         * @param userId 登录用户ID
+         * @param messageId 消息ID
+         * @return 已读状态
+         * */
+        fun getMessageReadState(userId: Int, messageId: Int): Boolean
+
         /**撤回消息
+         * @param userId 登录用户ID
          * @param messageId 消息ID
          * */
-        fun deleteMessage(messageId: Int): Boolean
+        fun deleteMessage(userId: Int, messageId: Int): Boolean
 
     }
 

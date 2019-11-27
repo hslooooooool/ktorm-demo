@@ -133,6 +133,9 @@ interface IChatController {
         @GetMapping("/getMessageById")
         @ApiOperation(value = "获取消息数据")
         fun getMessageById(
+                @RequestHeader
+                @ApiParam(value = "登录用户ID", required = true)
+                userId: Int,
                 @RequestParam(name = "messageId")
                 @ApiParam(value = "消息ID", required = true)
                 messageId: Int
@@ -141,6 +144,9 @@ interface IChatController {
         @GetMapping("/getMessageListByIds")
         @ApiOperation(value = "获取消息列表数据")
         fun getMessageListByIds(
+                @RequestHeader
+                @ApiParam(value = "登录用户ID", required = true)
+                userId: Int,
                 @RequestParam(name = "messageIds")
                 @ApiParam(value = "消息ID集合", required = true)
                 messageIds: List<Int>
@@ -149,6 +155,9 @@ interface IChatController {
         @GetMapping("/getMessageListBySessionId")
         @ApiOperation(value = "获取会话下的消息列表")
         fun getMessageListBySessionId(
+                @RequestHeader
+                @ApiParam(value = "登录用户ID", required = true)
+                userId: Int,
                 @RequestParam
                 @ApiParam(value = "会话ID", required = true)
                 sessionId: Int
@@ -157,6 +166,9 @@ interface IChatController {
         @GetMapping("/getMessageListBySessionIdAndTimeline")
         @ApiOperation(value = "获取会话下的消息列表")
         fun getMessageListBySessionIdAndTimeline(
+                @RequestHeader
+                @ApiParam(value = "登录用户ID", required = true)
+                userId: Int,
                 @RequestParam
                 @ApiParam(value = "会话ID", required = true)
                 sessionId: Int,
@@ -176,6 +188,9 @@ interface IChatController {
         @DeleteMapping("/deleteMessage")
         @ApiOperation(value = "删除(撤销)消息")
         fun deleteMessage(
+                @RequestHeader
+                @ApiParam(value = "登录用户ID", required = true)
+                userId: Int,
                 @RequestParam
                 @ApiParam(value = "待删除的消息ID", required = true)
                 messageId: Int

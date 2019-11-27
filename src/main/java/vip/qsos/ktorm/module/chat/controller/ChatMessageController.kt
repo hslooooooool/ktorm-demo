@@ -12,23 +12,23 @@ open class ChatMessageController @Autowired constructor(
         private val mChatMessageService: IChatService.IMessage
 ) : IChatController.IMessage {
 
-    override fun getMessageById(messageId: Int): MResult<ChatMessageBo> {
-        val result = mChatMessageService.getMessageById(messageId)
+    override fun getMessageById(userId: Int, messageId: Int): MResult<ChatMessageBo> {
+        val result = mChatMessageService.getMessageById(userId, messageId)
         return MResult<ChatMessageBo>().result(result)
     }
 
-    override fun getMessageListByIds(messageIds: List<Int>): MResult<List<ChatMessageBo>> {
-        val result = mChatMessageService.getMessageListByIds(messageIds)
+    override fun getMessageListByIds(userId: Int, messageIds: List<Int>): MResult<List<ChatMessageBo>> {
+        val result = mChatMessageService.getMessageListByIds(userId, messageIds)
         return MResult<List<ChatMessageBo>>().result(result)
     }
 
-    override fun getMessageListBySessionId(sessionId: Int): MResult<List<ChatMessageInfoBo>> {
-        val result = mChatMessageService.getMessageListBySessionId(sessionId)
+    override fun getMessageListBySessionId(userId: Int, sessionId: Int): MResult<List<ChatMessageInfoBo>> {
+        val result = mChatMessageService.getMessageListBySessionId(userId, sessionId)
         return MResult<List<ChatMessageInfoBo>>().result(result)
     }
 
-    override fun getMessageListBySessionIdAndTimeline(sessionId: Int, timeline: Int): MResult<List<ChatMessageInfoBo>> {
-        val result = mChatMessageService.getMessageListBySessionIdAndTimeline(sessionId, timeline)
+    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int): MResult<List<ChatMessageInfoBo>> {
+        val result = mChatMessageService.getMessageListBySessionIdAndTimeline(userId, sessionId, timeline)
         return MResult<List<ChatMessageInfoBo>>().result(result)
     }
 
@@ -42,8 +42,8 @@ open class ChatMessageController @Autowired constructor(
         return MResult<ChatMessageBo>().result(result)
     }
 
-    override fun deleteMessage(messageId: Int): MResult<Boolean> {
-        val result = mChatMessageService.deleteMessage(messageId)
+    override fun deleteMessage(userId: Int, messageId: Int): MResult<Boolean> {
+        val result = mChatMessageService.deleteMessage(userId, messageId)
         return MResult<Boolean>().result(result)
     }
 
