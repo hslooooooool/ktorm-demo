@@ -33,35 +33,22 @@ class ChatMessageService @Autowired constructor(
 
     override fun getMessageListBySessionId(userId: Int, sessionId: Int): List<ChatMessageInfoBo> {
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
-        DBChatMessage.select()
-                .where {
-                    (DBChatMessage.sessionId eq sessionId) and (DBChatMessage.cancelBack eq false)
-                }.map {
-                    getDBChatUserWithMessage(userId, DBChatMessage.createEntity(it), list)
-                }
+        DBChatMessage.select().where {
+            (DBChatMessage.sessionId eq sessionId) and (DBChatMessage.cancelBack eq false)
+        }.map {
+            getDBChatUserWithMessage(userId, DBChatMessage.createEntity(it), list)
+        }
         return list
     }
 
-    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int): List<ChatMessageInfoBo> {
+    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int?): List<ChatMessageInfoBo> {
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
-        DBChatMessage.findList {
-            it.sessionId eq sessionId
-        }
         DBChatMessage.select().where {
-            DBChatMessage.sessionId eq sessionId
+            (DBChatMessage.sessionId eq sessionId) and (DBChatMessage.cancelBack eq false)
         }.having {
-            DBChatMessage.timeline greater timeline
+            DBChatMessage.timeline greater (timeline ?: -1)
         }.map { row ->
-            val msg = TableChatMessage(
-                    messageId = row[DBChatMessage.messageId]!!,
-                    sessionId = row[DBChatMessage.sessionId] ?: -1,
-                    timeline = row[DBChatMessage.timeline]!!,
-                    content = row[DBChatMessage.content] ?: "",
-                    gmtCreate = row[DBChatMessage.gmtCreate]!!,
-                    gmtUpdate = row[DBChatMessage.gmtUpdate]!!,
-                    deleted = row[DBChatMessage.deleted]!!
-            )
-            getDBChatUserWithMessage(userId, msg, list)
+            getDBChatUserWithMessage(userId, DBChatMessage.createEntity(row), list)
         }
         return list
     }
@@ -145,7 +132,11 @@ class ChatMessageService @Autowired constructor(
             throw BaseException("会话不存在，发送失败")
         }
         val group = mChatGroupService.getGroupById(message.sessionId)
-        val lastTimeline = (if (group.lastTimeline < 0) 0 else group.lastTimeline) + 1
+        val lastTimeline = if (group.lastTimeline < 0) {
+            0
+        } else {
+            group.lastTimeline + 1
+        }
         if (message.messageId > 0) {
             // 更新
             DBChatMessage.update {

@@ -173,8 +173,8 @@ interface IChatController {
                 @ApiParam(value = "会话ID", required = true)
                 sessionId: Int,
                 @RequestParam
-                @ApiParam(value = "时序", required = true)
-                timeline: Int
+                @ApiParam(value = "时序")
+                timeline: Int? = null
         ): MResult<List<ChatMessageInfoBo>>
 
         @GetMapping("/getMessageListByUserId")
@@ -207,6 +207,8 @@ interface IChatController {
                 messageId: Int
         ): MResult<Boolean>
 
+        /**提送消息读取数更新*/
+        fun pushMessageRead(userId: Int, messageId: Int, readNum: Int)
     }
 
     @Api(tags = ["聊天群"])

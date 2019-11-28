@@ -28,7 +28,7 @@ open class ChatMessageController @Autowired constructor(
         return MResult<List<ChatMessageInfoBo>>().result(result)
     }
 
-    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int): MResult<List<ChatMessageInfoBo>> {
+    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int?): MResult<List<ChatMessageInfoBo>> {
         val result = mChatMessageService.getMessageListBySessionIdAndTimeline(userId, sessionId, timeline)
         return MResult<List<ChatMessageInfoBo>>().result(result)
     }
@@ -45,7 +45,9 @@ open class ChatMessageController @Autowired constructor(
 
     override fun readMessage(userId: Int, messageId: Int): MResult<ChatMessageReadStatusBo> {
         val result = mChatMessageService.readMessage(userId, messageId)
-        // TODO if result.readState = true , pushMessage(result) to all
+        if (result.readStatus) {
+            pushMessageRead(userId, messageId, result.readNum)
+        }
         return MResult<ChatMessageReadStatusBo>().result(result)
     }
 
@@ -54,4 +56,7 @@ open class ChatMessageController @Autowired constructor(
         return MResult<Boolean>().result(result)
     }
 
+    override fun pushMessageRead(userId: Int, messageId: Int, readNum: Int) {
+
+    }
 }

@@ -114,7 +114,7 @@ interface IChatService {
          * @param sessionId 会话ID
          * @return 会话下的消息列表
          * */
-        fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int): List<ChatMessageInfoBo>
+        fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int? = null): List<ChatMessageInfoBo>
 
         /**获取用户发送的消息
          * @param userId 登录用户ID
