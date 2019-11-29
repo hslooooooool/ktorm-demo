@@ -180,10 +180,10 @@ interface IChatController {
                 next: Boolean = true,
                 @RequestParam(required = false)
                 @ApiParam(value = "页数")
-                page: Int = 1,
+                page: Int? = 1,
                 @RequestParam(required = false)
                 @ApiParam(value = "每页数量")
-                size: Int = 20
+                size: Int? = 20
         ): MResult<List<ChatMessageInfoBo>>
 
         @GetMapping("/getMessageListByUserId")

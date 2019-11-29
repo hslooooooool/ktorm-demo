@@ -41,7 +41,9 @@ class ChatMessageService @Autowired constructor(
         return list
     }
 
-    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int?, next: Boolean, page: Int, size: Int): List<ChatMessageInfoBo> {
+    override fun getMessageListBySessionIdAndTimeline(
+            userId: Int, sessionId: Int, timeline: Int?, next: Boolean, page: Int?, size: Int?
+    ): List<ChatMessageInfoBo> {
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
 
         DBChatMessage.select().where {
@@ -58,7 +60,9 @@ class ChatMessageService @Autowired constructor(
         return list
     }
 
-    private fun getDBChatUserWithMessage(userId: Int, msg: TableChatMessage, list: ArrayList<ChatMessageInfoBo>): ArrayList<ChatMessageInfoBo> {
+    private fun getDBChatUserWithMessage(
+            userId: Int, msg: TableChatMessage, list: ArrayList<ChatMessageInfoBo>
+    ): ArrayList<ChatMessageInfoBo> {
         DBChatUserWithMessage.findOne {
             it.messageId eq msg.messageId
         }?.let { v ->
