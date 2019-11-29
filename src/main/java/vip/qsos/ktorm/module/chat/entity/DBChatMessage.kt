@@ -6,7 +6,7 @@ import me.liuwj.ktorm.dsl.QueryRowSet
 import me.liuwj.ktorm.dsl.insertAndGenerateKey
 import me.liuwj.ktorm.schema.boolean
 import me.liuwj.ktorm.schema.int
-import me.liuwj.ktorm.schema.varchar
+import me.liuwj.ktorm.schema.text
 import vip.qsos.ktorm.module.AbsTable
 import vip.qsos.ktorm.module.MBaseTable
 import java.time.LocalDateTime
@@ -26,7 +26,7 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
     val messageId by int("id").primaryKey()
     val sessionId by int("session_id")
     val timeline by int("timeline")
-    val content by varchar("content")
+    val content by text("content")
     val cancelBack by boolean("cancel_back")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatMessage {
