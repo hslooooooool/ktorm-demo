@@ -1,0 +1,45 @@
+<RestClientRequest>
+  <option name="biscuits">
+    <list />
+  </option>
+  <option name="httpMethod" value="POST" />
+  <option name="urlBase" value="http://localhost:8085" />
+  <option name="urlPath" value="/chat/message/sendMessage" />
+  <option name="headers">
+    <list>
+      <KeyValuePair>
+        <option name="key" value="Accept" />
+        <option name="value" value="*/*" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="Cache-Control" />
+        <option name="value" value="no-cache" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="userId" />
+        <option name="value" value="2" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="Content-Type" />
+        <option name="value" value="application/json; charset=UTF-8" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="device" />
+        <option name="value" value="PC" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="applicationId" />
+        <option name="value" value="ABCL-BASE" />
+      </KeyValuePair>
+    </list>
+  </option>
+  <option name="parameters">
+    <list />
+  </option>
+  <option name="parametersEnabled" value="true" />
+  <option name="haveTextToSend" value="true" />
+  <option name="haveFileToSend" value="false" />
+  <option name="isFileUpload" value="false" />
+  <option name="textToSend" value="{&quot;cancelBack&quot;:false,&quot;content&quot;:{&quot;fields&quot;:{&quot;contentDesc&quot;:&quot;66966996966996&quot;,&quot;contentType&quot;:0,&quot;content&quot;:&quot;测试数据333123&quot;}},&quot;messageId&quot;:-1,&quot;sessionId&quot;:1,&quot;timeline&quot;:-1}" />
+  <option name="filesToSend" value="" />
+</RestClientRequest>

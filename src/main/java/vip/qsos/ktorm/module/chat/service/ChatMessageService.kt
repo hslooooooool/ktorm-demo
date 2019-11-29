@@ -146,16 +146,6 @@ class ChatMessageService @Autowired constructor(
         } else {
             group.lastTimeline + 1
         }
-        if (message.messageId > 0) {
-            // 更新
-            DBChatMessage.update {
-                it.cancelBack to true
-
-                where {
-                    it.messageId eq message.messageId
-                }
-            }
-        }
         // 插入
         message.messageId = -1
         message.timeline = lastTimeline
