@@ -174,7 +174,16 @@ interface IChatController {
                 sessionId: Int,
                 @RequestParam
                 @ApiParam(value = "时序")
-                timeline: Int? = null
+                timeline: Int? = null,
+                @RequestParam(required = false)
+                @ApiParam(value = "是否下一页")
+                next: Boolean = true,
+                @RequestParam(required = false)
+                @ApiParam(value = "页数")
+                page: Int = 1,
+                @RequestParam(required = false)
+                @ApiParam(value = "每页数量")
+                size: Int = 20
         ): MResult<List<ChatMessageInfoBo>>
 
         @GetMapping("/getMessageListByUserId")

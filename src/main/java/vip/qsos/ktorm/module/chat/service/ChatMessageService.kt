@@ -41,12 +41,17 @@ class ChatMessageService @Autowired constructor(
         return list
     }
 
-    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int?): List<ChatMessageInfoBo> {
+    override fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int?, next: Boolean, page: Int, size: Int): List<ChatMessageInfoBo> {
         val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
+
         DBChatMessage.select().where {
             (DBChatMessage.sessionId eq sessionId) and (DBChatMessage.cancelBack eq false)
         }.having {
-            DBChatMessage.timeline greater (timeline ?: -1)
+            if (next) {
+                DBChatMessage.timeline greater (timeline ?: -1)
+            } else {
+                DBChatMessage.timeline less (timeline ?: -1)
+            }
         }.map { row ->
             getDBChatUserWithMessage(userId, DBChatMessage.createEntity(row), list)
         }

@@ -112,9 +112,13 @@ interface IChatService {
         /**获取会话下的消息列表，时序以后
          * @param userId 登录用户ID
          * @param sessionId 会话ID
+         * @param timeline 消息时序
+         * @param next 请求消息时序以下的消息
+         * @param page 请求页码
+         * @param size 请求每页数量
          * @return 会话下的消息列表
          * */
-        fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int? = null): List<ChatMessageInfoBo>
+        fun getMessageListBySessionIdAndTimeline(userId: Int, sessionId: Int, timeline: Int?, next: Boolean = true, page: Int = 1, size: Int = 20): List<ChatMessageInfoBo>
 
         /**获取用户发送的消息
          * @param userId 登录用户ID
