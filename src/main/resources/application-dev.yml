@@ -52,9 +52,9 @@ spring:
       file-size-threshold: 0
       #上传文件的临时保存位置
       location: D:/file-server
-      #单个文件的最大值，默认是1MB
+      #单个文件的最大值，默认是10MB
       max-file-size: 10MB
-      #多个文件上传时的总大小 值，默认是10MB
+      #多个文件上传时的总大小 值，默认是50MB
       max-request-size: 50MB
       #是否延迟解析，默认是false
       resolve-lazily: false
