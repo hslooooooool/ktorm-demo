@@ -17,6 +17,7 @@ private const val TAB_NAME = "sys_resource"
  */
 object DBFileResource : MBaseTable<TableFileResource>(TAB_NAME) {
     val fileId by int("id").primaryKey()
+    val avatar by varchar("avatar")
     val url by varchar("file_url")
     val filename by varchar("file_name")
     val type by varchar("file_type")
@@ -24,6 +25,7 @@ object DBFileResource : MBaseTable<TableFileResource>(TAB_NAME) {
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableFileResource {
         return TableFileResource(
                 fileId = row[fileId]!!,
+                avatar = row[avatar]!!,
                 url = row[url]!!,
                 filename = row[filename]!!,
                 type = row[type],
@@ -36,6 +38,7 @@ object DBFileResource : MBaseTable<TableFileResource>(TAB_NAME) {
 
     override fun add(t: TableFileResource): Any {
         return this.insertAndGenerateKey {
+            it.avatar to t.avatar
             it.url to t.url
             it.filename to t.filename
             it.type to t.type
@@ -54,6 +57,9 @@ class TableFileResource : AbsTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var fileId: Int = -1
 
+    @Column(name = "avatar")
+    var avatar: String? = null
+
     @Column(name = "file_url")
     var url: String? = null
 
@@ -66,6 +72,7 @@ class TableFileResource : AbsTable {
     constructor()
     constructor(
             fileId: Int = -1,
+            avatar: String?,
             url: String?,
             filename: String?,
             type: String?,
@@ -75,6 +82,7 @@ class TableFileResource : AbsTable {
             deleted: Boolean = false
     ) {
         this.fileId = fileId
+        this.avatar = avatar
         this.url = url
         this.filename = filename
         this.type = type

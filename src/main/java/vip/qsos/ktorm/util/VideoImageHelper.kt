@@ -10,6 +10,7 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 import javax.imageio.ImageIO
+import kotlin.math.roundToInt
 
 /**
  * @author : 华清松
@@ -28,29 +29,34 @@ object VideoImageHelper {
      * 获取视频缩略图
      *
      * @param filePath：视频路径
-     * @param mod：视频长度/mod获取第几帧
+     * @param mod：视频长度 x mod 第几帧，如总帧数 20 x 0.1 ，小于0时取1（第一帧）
      */
     @Throws(Exception::class)
-    fun randomGrabberFFmpegImage(filePath: String, mod: Int): String? {
-        var targetFilePath = ""
+    fun randomGrabberFFmpegImage(filePath: String, mod: Float, avatarPath: String? = null): String? {
+        var targetFilePath = avatarPath
         val ff = FFmpegFrameGrabber.createDefault(filePath)
         ff.start()
         val rotate = ff.getVideoMetadata(ROTATE)
         val ffLength = ff.lengthInFrames
-        var f: Frame?
-        var i = 0
-        val index = ffLength / mod
-        while (i < ffLength) {
-            f = ff.grabImage()
-            if (i == index) {
-                if (null != rotate && rotate.length > 1) {
-                    val converter = ToIplImage()
-                    val src = converter.convert(f)
-                    f = converter.convert(rotate(src, rotate.toInt()))
+
+        var i = 1
+        var index: Int = (ffLength * mod).roundToInt()
+        if (mod < 0) {
+            index = 1
+        }
+        while (i <= ffLength) {
+            ff.grabImage()?.let {
+                var frame: Frame? = it
+                if (i == index) {
+                    if (null != rotate && rotate.length > 1) {
+                        val converter = ToIplImage()
+                        val src = converter.convert(frame)
+                        frame = converter.convert(rotate(src, rotate.toInt()))
+                    }
+                    targetFilePath = targetFilePath ?: getImagePath(filePath, i)
+                    doExecuteFrame(frame, targetFilePath)
+                    i = index
                 }
-                targetFilePath = getImagePath(filePath, i)
-                doExecuteFrame(f, targetFilePath)
-                break
             }
             i++
         }

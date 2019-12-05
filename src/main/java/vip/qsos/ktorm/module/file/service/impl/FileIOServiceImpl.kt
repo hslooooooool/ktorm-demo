@@ -68,9 +68,9 @@ open class FileIOServiceImpl @Autowired constructor(
             }
             val fileInfo = getUUIDFileName(file)
             val uuidFileName = fileInfo[0] + fileInfo[1]
-            val uuidFileNameOfMin = "min-$uuidFileName"
-            val originalUrlOfMin = "$folderPath$uuidFileNameOfMin"
-            var originalUrl = "$folderPath$uuidFileName"
+            val uuidFileNameOfAvatar = fileInfo[0] + "_avatar.png"
+            val originalUrl = "$folderPath$uuidFileName"
+            val originalUrlOfAvatar = "$folderPath$uuidFileNameOfAvatar"
 
             inputStream = file.inputStream
             outputStream = FileOutputStream(originalUrl)
@@ -87,19 +87,18 @@ open class FileIOServiceImpl @Autowired constructor(
             when (fileInfo[1].toLowerCase()) {
                 ".jpg", ".jpeg", ".png" -> {
                     // 如果是图片，保存一份缩略图，名称后加‘-min’即可访问
-                    changPicture(originalUrl, originalUrlOfMin)
-                    originalUrl = originalUrlOfMin
+                    changPicture(originalUrl, originalUrlOfAvatar)
                 }
                 ".mp4", ".3gp", ".flv" -> {
-                    LogUtils.d("生成的视频封面$originalUrl")
-                    val avatar = VideoImageHelper.randomGrabberFFmpegImage(originalUrl, 2)
-                    LogUtils.d("生成的视频封面$avatar")
+                    VideoImageHelper.randomGrabberFFmpegImage(originalUrl, 0.1f, originalUrlOfAvatar)
+                    LogUtils.i("生成的视频封面$originalUrlOfAvatar")
                 }
                 else -> {
                 }
             }
 
             fileList.add(FileResourceBo(
+                    avatar = originalUrlOfAvatar,
                     url = originalUrl,
                     filename = uuidFileName,
                     type = fileInfo[1]
