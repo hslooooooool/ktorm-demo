@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile
 import vip.qsos.ktorm.exception.BaseException
 import vip.qsos.ktorm.module.file.entity.FileResourceBo
 import vip.qsos.ktorm.module.file.service.IFileIOService
+import vip.qsos.ktorm.util.LogUtils
+import vip.qsos.ktorm.util.VideoImageHelper
 import java.io.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -87,6 +89,11 @@ open class FileIOServiceImpl @Autowired constructor(
                     // 如果是图片，保存一份缩略图，名称后加‘-min’即可访问
                     changPicture(originalUrl, originalUrlOfMin)
                     originalUrl = originalUrlOfMin
+                }
+                ".mp4", ".3gp", ".flv" -> {
+                    LogUtils.d("生成的视频封面$originalUrl")
+                    val avatar = VideoImageHelper.randomGrabberFFmpegImage(originalUrl, 2)
+                    LogUtils.d("生成的视频封面$avatar")
                 }
                 else -> {
                 }

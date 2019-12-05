@@ -26,7 +26,7 @@ object DBChatMessage : MBaseTable<TableChatMessage>(TAB_NAME) {
     val messageId by int("id").primaryKey()
     val sessionId by int("session_id")
     val timeline by int("timeline")
-    val content by text("content")
+    private val content by text("content")
     val cancelBack by boolean("cancel_back")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean): TableChatMessage {
@@ -73,7 +73,7 @@ class TableChatMessage : AbsTable {
     @ApiModelProperty(name = "sessionId", value = "会话ID")
     var sessionId: Int = -1
 
-    @Column(name = "content")
+    @Column(name = "content", length = 500)
     @ApiModelProperty(name = "content", value = "聊天消息内容")
     var content: String = ""
 
