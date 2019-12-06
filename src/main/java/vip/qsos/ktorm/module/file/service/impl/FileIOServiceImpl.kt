@@ -10,11 +10,14 @@ import vip.qsos.ktorm.module.file.entity.FileResourceBo
 import vip.qsos.ktorm.module.file.service.IFileIOService
 import vip.qsos.ktorm.util.LogUtils
 import vip.qsos.ktorm.util.VideoImageHelper
+import java.awt.image.BufferedImage
 import java.io.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import javax.imageio.ImageIO
 import javax.servlet.http.HttpServletResponse
+
 
 /**
  * @author : 华清松
@@ -68,7 +71,7 @@ open class FileIOServiceImpl @Autowired constructor(
             val uuidFileName = fileInfo[0] + fileInfo[1]
             val uuidFileNameOfAvatar = fileInfo[0] + "_avatar.png"
             val originalUrl = "$folderPath$uuidFileName"
-            val originalUrlOfAvatar = "$folderPath$uuidFileNameOfAvatar"
+            var originalUrlOfAvatar = "$folderPath$uuidFileNameOfAvatar"
 
             inputStream = file.inputStream
             outputStream = FileOutputStream(originalUrl)
@@ -83,9 +86,9 @@ open class FileIOServiceImpl @Autowired constructor(
             inputStream.close()
             outputStream.close()
             when (fileInfo[1].toLowerCase()) {
-                ".jpg", ".jpeg", ".png" -> {
-                    // 如果是图片，保存一份缩略图，名称后加‘-min’即可访问
-                    changPicture(originalUrl, originalUrlOfAvatar)
+                ".jpg", ".jpeg", ".png", ".gif", ".bmp" -> {
+                    // 如果是图片，保存一份缩略图
+                    originalUrlOfAvatar = changPicture(originalUrl, originalUrlOfAvatar)
                 }
                 ".mp4", ".3gp", ".flv" -> {
                     VideoImageHelper.randomGrabberFFmpegImage(originalUrl, 0.1f, originalUrlOfAvatar)
@@ -106,11 +109,36 @@ open class FileIOServiceImpl @Autowired constructor(
     }
 
     /**将原图压缩成256*256*/
-    private fun changPicture(originalUrl: String, changeUrl: String) {
+    private fun changPicture(originalUrl: String, changeUrl: String): String {
         try {
-            Thumbnails.of(originalUrl).size(256, 256).keepAspectRatio(true).toFile(changeUrl)
+            val file = File(originalUrl)
+            val image = ImageIO.read(file)
+            return if (file.length() <= 100 * 1000 || image.width <= 256 || image.height <= 256) {
+                originalUrl
+            } else {
+                Thumbnails.of(originalUrl)
+                        .size(256, 256)
+                        .imageType(BufferedImage.TYPE_INT_ARGB)
+                        .outputFormat("png")
+                        .toFile(changeUrl)
+
+                changeUrl
+            }
         } catch (e: Exception) {
-            throw BaseException("文件处理报错")
+            e.printStackTrace()
+            return try {
+                val thumbnail = Thumbnails.of(originalUrl)
+                        .size(256, 256)
+                        .imageType(BufferedImage.TYPE_INT_ARGB)
+                        .asBufferedImage()
+                ImageIO.write(thumbnail, "png", File(changeUrl))
+
+                changeUrl
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+                originalUrl
+            }
         }
     }
 

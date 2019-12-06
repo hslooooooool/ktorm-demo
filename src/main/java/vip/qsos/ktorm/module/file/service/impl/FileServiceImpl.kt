@@ -22,6 +22,7 @@ open class FileServiceImpl @Autowired constructor(
         try {
             saveFiles = mFileIOService.saveData(files)
         } catch (e: Exception) {
+            e.printStackTrace()
             throw BaseException("文件上传失败")
         }
         val result = arrayListOf<FileResourceBo>()
@@ -37,6 +38,7 @@ open class FileServiceImpl @Autowired constructor(
         try {
             mFileIOService.getData(httpResponse, url)
         } catch (e: Exception) {
+            e.printStackTrace()
             throw BaseException("文件下载失败")
         }
     }
