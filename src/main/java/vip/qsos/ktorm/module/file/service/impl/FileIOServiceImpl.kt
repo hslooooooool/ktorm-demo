@@ -27,7 +27,6 @@ open class FileIOServiceImpl @Autowired constructor(
 ) : IFileIOService {
 
     /**下载资源*/
-    @Throws(IOException::class)
     override fun getData(httpResponse: HttpServletResponse, url: String) {
         var fileInputStream: FileInputStream? = null
         var outputStream: OutputStream? = null
@@ -54,7 +53,6 @@ open class FileIOServiceImpl @Autowired constructor(
     }
 
     /**保存资源*/
-    @Throws(BaseException::class)
     override fun saveData(multipartFile: List<MultipartFile>): List<FileResourceBo> {
         val fileList = ArrayList<FileResourceBo>()
         var outputStream: FileOutputStream?
@@ -108,9 +106,12 @@ open class FileIOServiceImpl @Autowired constructor(
     }
 
     /**将原图压缩成256*256*/
-    @Throws(BaseException::class)
     private fun changPicture(originalUrl: String, changeUrl: String) {
-        Thumbnails.of(originalUrl).size(256, 256).keepAspectRatio(true).toFile(changeUrl)
+        try {
+            Thumbnails.of(originalUrl).size(256, 256).keepAspectRatio(true).toFile(changeUrl)
+        } catch (e: Exception) {
+            throw BaseException("文件处理报错")
+        }
     }
 
     /**获得拼接的uuid*/

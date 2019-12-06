@@ -57,9 +57,11 @@ class TableChatSession : AbsTable {
     var sessionId: Int = -1
 
     @Column(name = "chat_type")
+    @ApiModelProperty(name = "type", value = "会话类型")
     var type: ChatSessionType = ChatSessionType.SINGLE
 
     @Column(name = "hash_code", unique = true)
+    @ApiModelProperty(name = "hashCode", value = "会话唯一标识，以会话内成员id正序排列拼接所得，保证相同成员仅创建一个会话")
     var hashCode: String = ""
 
     constructor()

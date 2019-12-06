@@ -6,6 +6,7 @@ import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.Java2DFrameConverter
 import org.bytedeco.javacv.OpenCVFrameConverter.ToIplImage
+import vip.qsos.ktorm.exception.BaseException
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -31,7 +32,7 @@ object VideoImageHelper {
      * @param filePath：视频路径
      * @param mod：视频长度 x mod 第几帧，如总帧数 20 x 0.1 ，小于0时取1（第一帧）
      */
-    @Throws(Exception::class)
+    @Throws(BaseException::class)
     fun randomGrabberFFmpegImage(filePath: String, mod: Float, avatarPath: String? = null): String? {
         var targetFilePath = avatarPath
         val ff = FFmpegFrameGrabber.createDefault(filePath)

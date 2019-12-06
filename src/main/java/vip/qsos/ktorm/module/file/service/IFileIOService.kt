@@ -14,12 +14,11 @@ import javax.servlet.http.HttpServletResponse
 interface IFileIOService {
 
     /**下载资源*/
-    @Throws(IOException::class)
+    @Throws(BaseException::class)
     fun getData(httpResponse: HttpServletResponse, url: String)
 
     /**保存资源*/
     @Throws(BaseException::class)
     fun saveData(multipartFile: List<MultipartFile>): List<FileResourceBo>
-
 
 }

@@ -18,7 +18,12 @@ open class FileServiceImpl @Autowired constructor(
 
     @Transactional(rollbackFor = [BaseException::class])
     override fun upload(files: List<MultipartFile>): List<FileResourceBo> {
-        val saveFiles = mFileIOService.saveData(files)
+        var saveFiles: List<FileResourceBo> = arrayListOf()
+        try {
+            saveFiles = mFileIOService.saveData(files)
+        } catch (e: Exception) {
+            throw BaseException("文件上传失败")
+        }
         val result = arrayListOf<FileResourceBo>()
         saveFiles.forEach {
             val table = it.toTable()
@@ -29,6 +34,10 @@ open class FileServiceImpl @Autowired constructor(
     }
 
     override fun downLoad(httpResponse: HttpServletResponse, url: String) {
-        mFileIOService.getData(httpResponse, url)
+        try {
+            mFileIOService.getData(httpResponse, url)
+        } catch (e: Exception) {
+            throw BaseException("文件下载失败")
+        }
     }
 }

@@ -34,7 +34,7 @@ class FileResourceBo : IBo<TableFileResource> {
 
     companion object {
         // FIXME 配置访问HOST
-        const val PATH = "http://192.168.3.108:8085/"
+        const val PATH = "http://192.168.0.109:8085/"
     }
 
     override fun getBo(table: TableFileResource?): IBo<TableFileResource>? {
