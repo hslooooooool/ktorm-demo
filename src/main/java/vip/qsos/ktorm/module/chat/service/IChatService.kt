@@ -93,14 +93,14 @@ interface IChatService {
          * @param messageId 消息ID
          * @return 消息数据
          * */
-        fun getMessageById(userId: Int, messageId: Int): ChatMessageBo
+        fun getMessageById(userId: Int, messageId: Int): ChatMessageInfoBo
 
         /**获取消息列表数据
          * @param userId 登录用户ID
          * @param messageIds 消息ID集合
          * @return 消息列表数据
          * */
-        fun getMessageListByIds(userId: Int, messageIds: List<Int>): List<ChatMessageBo>
+        fun getMessageListByIds(userId: Int, messageIds: List<Int>): List<ChatMessageInfoBo>
 
         /**获取会话下的消息列表
          * @param userId 登录用户ID

@@ -13,14 +13,14 @@ open class ChatMessageController @Autowired constructor(
         private val mChatMessageService: IChatService.IMessage
 ) : IChatController.IMessage {
 
-    override fun getMessageById(userId: Int, messageId: Int): MResult<ChatMessageBo> {
+    override fun getMessageById(userId: Int, messageId: Int): MResult<ChatMessageInfoBo> {
         val result = mChatMessageService.getMessageById(userId, messageId)
-        return MResult<ChatMessageBo>().result(result)
+        return MResult<ChatMessageInfoBo>().result(result)
     }
 
-    override fun getMessageListByIds(userId: Int, messageIds: List<Int>): MResult<List<ChatMessageBo>> {
+    override fun getMessageListByIds(userId: Int, messageIds: List<Int>): MResult<List<ChatMessageInfoBo>> {
         val result = mChatMessageService.getMessageListByIds(userId, messageIds)
-        return MResult<List<ChatMessageBo>>().result(result)
+        return MResult<List<ChatMessageInfoBo>>().result(result)
     }
 
     override fun getMessageListBySessionId(userId: Int, sessionId: Int): MResult<List<ChatMessageInfoBo>> {

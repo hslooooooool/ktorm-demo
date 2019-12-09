@@ -139,7 +139,7 @@ interface IChatController {
                 @RequestParam(name = "messageId")
                 @ApiParam(value = "消息ID", required = true)
                 messageId: Int
-        ): MResult<ChatMessageBo>
+        ): MResult<ChatMessageInfoBo>
 
         @GetMapping("/getMessageListByIds")
         @ApiOperation(value = "获取消息列表数据")
@@ -150,7 +150,7 @@ interface IChatController {
                 @RequestParam(name = "messageIds")
                 @ApiParam(value = "消息ID集合", required = true)
                 messageIds: List<Int>
-        ): MResult<List<ChatMessageBo>>
+        ): MResult<List<ChatMessageInfoBo>>
 
         @GetMapping("/getMessageListBySessionId")
         @ApiOperation(value = "获取会话下的消息列表")

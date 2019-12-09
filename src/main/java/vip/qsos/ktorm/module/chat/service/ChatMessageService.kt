@@ -20,15 +20,25 @@ class ChatMessageService @Autowired constructor(
         private val mChatMessageProperties: ChatMessageProperties
 ) : IChatService.IMessage {
 
-    override fun getMessageById(userId: Int, messageId: Int): ChatMessageBo {
-        return ChatMessageBo().getBo(DBChatMessage.findById(messageId)) as ChatMessageBo?
-                ?: throw BaseException("消息不存在")
+    override fun getMessageById(userId: Int, messageId: Int): ChatMessageInfoBo {
+        val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
+        DBChatMessage.select().where {
+            DBChatMessage.messageId eq messageId
+        }.map {
+            getDBChatUserWithMessage(userId, DBChatMessage.createEntity(it), list)
+        }
+        if (list.isEmpty()) {
+            throw BaseException("消息不存在")
+        }
+        return list[0]
     }
 
-    override fun getMessageListByIds(userId: Int, messageIds: List<Int>): List<ChatMessageBo> {
-        return DBChatMessage.findListByIds(messageIds).map {
-            ChatMessageBo().getBo(it) as ChatMessageBo
+    override fun getMessageListByIds(userId: Int, messageIds: List<Int>): List<ChatMessageInfoBo> {
+        val list: ArrayList<ChatMessageInfoBo> = arrayListOf()
+        DBChatMessage.findListByIds(messageIds).map {
+            getDBChatUserWithMessage(userId, it, list)
         }
+        return list
     }
 
     override fun getMessageListBySessionId(userId: Int, sessionId: Int): List<ChatMessageInfoBo> {
