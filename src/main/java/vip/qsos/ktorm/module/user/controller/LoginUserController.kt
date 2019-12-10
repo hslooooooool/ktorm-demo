@@ -2,6 +2,7 @@ package vip.qsos.ktorm.module.user.controller
 
 import me.liuwj.ktorm.dsl.and
 import me.liuwj.ktorm.dsl.eq
+import me.liuwj.ktorm.dsl.update
 import me.liuwj.ktorm.entity.findOne
 import org.springframework.web.bind.annotation.RestController
 import vip.qsos.ktorm.module.chat.entity.DBChatUser
@@ -24,6 +25,28 @@ class LoginUserController : ILoginUserModel {
         } else {
             MResult<LoginUserBo>().result(user)
         }
+    }
+
+    override fun updateUser(userId: Int, userName: String, avatar: String?, birth: String?, sexuality: Int): MResult<Boolean> {
+        val result1 = DBChatUser.update {
+            it.userName to userName
+            it.avatar to avatar
+            it.birth to birth
+            it.sexuality to sexuality
+            where {
+                it.userId eq userId
+            }
+        }
+        val result2 = DBLoginUser.update {
+            it.userName to userName
+            it.avatar to avatar
+            it.birth to birth
+            it.sexuality to sexuality
+            where {
+                it.userId eq userId
+            }
+        }
+        return MResult<Boolean>().result(result1 + result2 == 2)
     }
 
     override fun register(account: String, password: String): MResult<LoginUserBo> {

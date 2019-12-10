@@ -3,7 +3,7 @@ package vip.qsos.ktorm.module.chat.entity.form
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
-@ApiModel(description = "创建聊天用户表单数据")
+@ApiModel(description = "聊天用户表单数据")
 data class FormCreateUser(
         @ApiModelProperty(name = "userName", value = "用户姓名")
         var userName: String,
